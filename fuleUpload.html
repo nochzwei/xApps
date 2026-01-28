@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TurningPoint | Missing Documentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --tp-primary:#0F447A;
+      --tp-primary-600:#155EAB;
+      --tp-accent:#1C74D9;
+      --tp-bg:#F8FAFD;
+      --tp-border:#D7E1F0;
+      --tp-success:#1E9E6A;
+      --tp-danger:#B42323;
+      --tp-text:#0B1B2B;
+    }
+    .tp-gradient { background: linear-gradient(135deg, var(--tp-primary) 0%, var(--tp-accent) 100%); }
+    .tp-card { background:#fff; box-shadow: 0 10px 24px rgba(15,68,122,0.08); border:1px solid var(--tp-border); }
+    .tp-btn { background: var(--tp-accent); }
+    .tp-btn[disabled] { opacity:.6; cursor:not-allowed; }
+    .tp-btn:hover { background: var(--tp-primary-600); }
+    .tp-link { color: var(--tp-accent); }
+    .tp-link:hover { color: var(--tp-primary-600); }
+    .dropzone-hover { border-color: var(--tp-accent) !important; background:#ECF3FF !important; }
+  </style>
+</head>
+<body class="m-0 min-h-screen bg-[var(--tp-bg)] text-[var(--tp-text)]">
+
+  <!-- Top bar -->
+  <header class="w-full tp-gradient text-white">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+      <img
+        src="https://cdn.prod.website-files.com/625d823272252c05676be0c4/6270439c0e18d882a6d98762_Logo-Corporate-Color.svg"
+        alt="TurningPoint Healthcare Logo"
+        class="h-8"
+      />
+      <div class="ml-auto text-sm opacity-90">Secure Provider Upload</div>
+    </div>
+  </header>
+
+  <!-- Main card -->
+  <main class="max-w-3xl mx-auto p-4 md:p-6">
+    <div class="tp-card rounded-xl p-6 md:p-8">
+      <p class="mt-2 text-[color:rgba(11,27,43,0.75)]">
+        Upload the files to complete your authorization request. You can take a picture with your phone or
+        drag & drop files from your computer.
+      </p>
+
+      <!-- Case metadata -->
+      <form id="tpForm" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="return false;">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="caseId">Case Number</label>
+          <input id="caseId" name="caseId" type="text" required
+                 value="TP-442918" readonly aria-readonly="true"
+                 class="w-full bg-gray-100 rounded-lg border border-[var(--tp-border)] px-3 py-2 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1" for="tin">Provider Tax ID (TIN)</label>
+          <input id="tin" name="tin" type="text" inputmode="numeric" required
+                 value="62-85485" readonly aria-readonly="true"
+                 class="w-full bg-gray-100 rounded-lg border border-[var(--tp-border)] px-3 py-2 focus:outline-none" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium mb-1" for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes" rows="3" placeholder="Add any context about these documents…"
+                    class="w-full rounded-lg border border-[var(--tp-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--tp-accent)]"></textarea>
+        </div>
+      </form>
+
+      <!-- Upload area -->
+      <div id="dropzone"
+           class="mt-6 border-2 border-dashed border-[var(--tp-border)] rounded-xl p-6 bg-[white] text-center cursor-pointer transition"
+           onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault(); this.classList.add('dropzone-hover')"
+           ondragleave="this.classList.remove('dropzone-hover')"
+           ondrop="handleDrop(event)">
+        <div class="flex flex-col items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M3 15a4 4 0 0 0 4 4h10a4 4 0 0 0 1-7.874V11a5 5 0 1 0-9.584-2.121A4.001 4.001 0 0 0 7 17h3"/>
+          </svg>
+          <p class="font-medium">Click to choose files or drag & drop here</p>
+          <p class="text-sm text-[color:rgba(11,27,43,0.6)] mt-1">PDF, JPG, PNG, TIFF, HEIC — up to 15 MB each</p>
+          <div class="mt-4 flex flex-wrap gap-2 justify-center">
+            <button type="button"
+                    onclick="document.getElementById('cameraInput').click()"
+                    class="tp-btn text-white font-semibold px-4 py-2 rounded-lg">
+              Take a Photo
+            </button>
+            <button type="button"
+                    onclick="document.getElementById('fileInput').click()"
+                    class="px-4 py-2 rounded-lg border border-[var(--tp-border)] hover:border-[var(--tp-accent)]">
+              Choose Files
+            </button>
+          </div>
+        </div>
+
+        <!-- File pickers -->
+        <input id="fileInput" type="file" class="hidden"
+               accept="image/*,.pdf,.heic,.heif,.tif,.tiff,.png,.jpg,.jpeg" multiple
+               onchange="handleFiles(this.files)" />
+        <!-- On mobile, opens camera directly -->
+        <input id="cameraInput" type="file" class="hidden"
+               accept="image/*,.heic,.heif,.png,.jpg,.jpeg"
+               capture="environment"
+               onchange="handleFiles(this.files)" />
+      </div>
+
+      <!-- Selected files list -->
+      <div id="fileList" class="mt-4 hidden">
+        <h2 class="text-lg font-semibold mb-2">Files to Upload</h2>
+        <ul id="fileItems" class="space-y-2"></ul>
+      </div>
+
+      <!-- Consent -->
+      <div class="mt-6 bg-[var(--tp-bg)] border border-[var(--tp-border)] rounded-lg p-4">
+        <label class="inline-flex items-start gap-3">
+          <input id="consent" type="checkbox" class="mt-1">
+          <span class="text-sm">
+            I confirm these documents are accurate and authorized for submission to TurningPoint Healthcare for the referenced case.
+            I understand PHI will be handled according to HIPAA and TurningPoint privacy policies.
+          </span>
+        </label>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-6 flex flex-col md:flex-row gap-3">
+        <button id="uploadBtn"
+                class="tp-btn text-white font-semibold px-6 py-3 rounded-lg disabled:opacity-50"
+                type="button" onclick="submitFiles()">
+          Upload & Continue
+        </button>
+        <button class="px-6 py-3 rounded-lg border border-[var(--tp-border)] hover:border-[var(--tp-accent)]"
+                type="button"
+                onclick="SDK && SDK.cancel ? SDK.cancel() : window.history.back()">
+          Cancel
+        </button>
+      </div>
+
+      <!-- Status -->
+      <div id="status" class="mt-4 text-sm"></div>
+    </div>
+
+    <p class="text-xs text-center mt-6 text-[color:rgba(11,27,43,0.55)]">
+      Need help? Visit the TurningPoint <a class="tp-link underline" href="https://www.turningpoint-healthcare.com/help-center" target="_blank" rel="noreferrer">Help Center</a>.
+    </p>
+  </main>
+
+  <script>
+    // In Cognigy xApps, SDK is injected. Create a small shim for local testing.
+    window.SDK = window.SDK || { submit: (p) => alert('Submitted: ' + JSON.stringify(p)) };
+
+    const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+    const fileQueue = [];
+
+    function handleDrop(e){
+      e.preventDefault();
+      e.currentTarget.classList.remove('dropzone-hover');
+      handleFiles(e.dataTransfer.files);
+    }
+
+    function handleFiles(files){
+      // console.log('Selected files:', files); // uncomment for debugging
+      for (const f of files){
+        if (!validateFile(f)) continue;
+        fileQueue.push(f);
+      }
+      renderList();
+    }
+
+    function validateFile(file){
+      const sizeOk = file.size > 0 && file.size <= MAX_FILE_SIZE;
+
+      // Heuristics: MIME OR filename extension
+      const looksLikeImage =
+        (file.type && file.type.startsWith('image/')) ||
+        (file.name && /\.(heic|heif|tif|tiff|png|jpe?g)$/i.test(file.name));
+
+      const looksLikePdf =
+        file.type === 'application/pdf' ||
+        (file.name && /\.pdf$/i.test(file.name));
+
+      // iOS album edge case: empty or generic MIME, no/odd extension — allow if size > 0
+      const unknownButOkay =
+        (!file.type || file.type === 'application/octet-stream') && file.size > 0;
+
+      if (!sizeOk){
+        if (file.size === 0) {
+          toast('Selected file appears empty: ' + (file.name || 'unnamed'), 'danger');
+        } else {
+          toast('File too large (max 15 MB): ' + (file.name || 'unnamed'), 'danger');
+        }
+        return false;
+      }
+
+      if (looksLikeImage || looksLikePdf || unknownButOkay) {
+        return true;
+      }
+
+      toast('Unsupported file type: ' + (file.name || 'unnamed'), 'danger');
+      return false;
+    }
+
+    function renderList(){
+      const list = document.getElementById('fileList');
+      const items = document.getElementById('fileItems');
+      items.innerHTML = '';
+      if (fileQueue.length === 0){
+        list.classList.add('hidden');
+        return;
+      }
+      list.classList.remove('hidden');
+
+      fileQueue.forEach((f, idx) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between gap-3 p-3 border border-[var(--tp-border)] rounded-lg';
+
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-3';
+
+        // Preview thumbnail (ObjectURL works for HEIC on iOS Safari)
+        if ((f.type && f.type.startsWith('image/')) || (f.name && /\.(heic|heif|tif|tiff|png|jpe?g)$/i.test(f.name))){
+          const img = document.createElement('img');
+          img.className = 'h-12 w-12 object-cover rounded';
+          img.src = URL.createObjectURL(f);
+          img.onload = () => URL.revokeObjectURL(img.src);
+          left.appendChild(img);
+        } else {
+          const icon = document.createElement('div');
+          icon.className = 'h-12 w-12 grid place-items-center rounded bg-[var(--tp-bg)] border border-[var(--tp-border)]';
+          icon.innerHTML = '<span class="text-xs">PDF</span>';
+          left.appendChild(icon);
+        }
+
+        const meta = document.createElement('div');
+        meta.innerHTML = `<div class="font-medium break-all">${f.name || 'unnamed'}</div>
+                          <div class="text-xs opacity-70">${(f.size/1024/1024).toFixed(2)} MB</div>`;
+        left.appendChild(meta);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'text-sm tp-link underline';
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = () => { fileQueue.splice(idx,1); renderList(); };
+
+        li.append(left, removeBtn);
+        items.appendChild(li);
+      });
+    }
+
+    function toast(msg, type='info'){
+      const status = document.getElementById('status');
+      const colors = {
+        info: 'text-[var(--tp-text)]',
+        success: 'text-[var(--tp-success)]',
+        danger: 'text-[var(--tp-danger)]'
+      };
+      status.className = 'mt-4 text-sm ' + (colors[type] || colors.info);
+      status.textContent = msg;
+    }
+
+    async function submitFiles(){
+      const caseId = document.getElementById('caseId').value.trim();
+      const tin = document.getElementById('tin').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const consent = document.getElementById('consent').checked;
+      const btn = document.getElementById('uploadBtn');
+
+      if (!caseId || !tin){
+        toast('Case Number and Provider TIN are required.', 'danger');
+        return;
+      }
+      if (!consent){
+        toast('Please confirm consent before uploading.', 'danger');
+        return;
+      }
+      if (fileQueue.length === 0){
+        toast('Please add at least one document or photo.', 'danger');
+        return;
+      }
+
+      btn.disabled = true;
+      toast('Uploading…');
+
+      // In production, POST files to your backend or a presigned URL; here we pass metadata only.
+      const filesMeta = fileQueue.map(f => ({ name: f.name || 'unnamed', type: f.type || 'unknown', size: f.size }));
+
+      setTimeout(() => {
+        toast('Files uploaded successfully.', 'success');
+        SDK.submit({
+          option: 'filesUploaded',
+          caseId, tin, notes,
+          count: fileQueue.length,
+          files: filesMeta
+        });
+        btn.disabled = false;
+      }, 600);
+    }
+  </script>
+</body>
+</html>
