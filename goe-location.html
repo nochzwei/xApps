@@ -1,86 +1,190 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Geolocation Example</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.0.0/dist/tailwind.min.css"
-      rel="stylesheet"
-    /> -->
-  </head>
-  <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="text-center">
-      <button
-        id="getLocationBtn"
-        type="button"
-        class="inline-flex items-center gap-x-1.5 whitespace-nowrap rounded-md bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-      >
-        Send your Location
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="{1.5}"
-          stroke="currentColor"
-          class="flex-shrink-0 w-7 h-5"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-          />
-        </svg>
-      </button>
-      <p id="locationDisplay" class="mt-4 text-lg text-gray-700"></p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Share Your Location</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      margin: 0; padding: 24px;
+      display: grid; place-items: center; min-height: 100dvh;
+      background: canvas; color: canvastext;
+    }
+    .card {
+      width: min(520px, 100%);
+      border: 1px solid color-mix(in oklab, canvastext 15%, transparent);
+      border-radius: 12px; padding: 20px 18px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.08);
+      background: canvas;
+    }
+    h1 { font-size: 1.15rem; margin: 0 0 10px; }
+    p { margin: 0 0 14px; line-height: 1.4; }
+    .actions { display: flex; gap: 10px; margin-top: 10px; }
+    button {
+      appearance: none; border: 0; border-radius: 10px;
+      padding: 10px 14px; cursor: pointer; font-weight: 600;
+    }
+    .primary { background: #2563eb; color: #fff; }
+    .ghost { background: transparent; color: inherit; border: 1px solid color-mix(in oklab, canvastext 25%, transparent); }
+    .muted { font-size: .9rem; color: color-mix(in oklab, canvastext 60%, transparent); }
+    .status { margin-top: 12px; font-size: .95rem; }
+    code.inline { font-family: ui-monospace, Menlo, Consolas, monospace; padding: 0 .25em; border-radius: 4px; background: color-mix(in oklab, canvastext 6%, canvas); }
+  </style>
+</head>
+<body>
+  <div class="card" role="dialog" aria-labelledby="title" aria-modal="true">
+    <h1 id="title">Share your location</h1>
+    <p>We’ll ask your browser for your current location and securely send it back to the assistant. This is optional.</p>
+    <div class="actions">
+      <button id="shareBtn" class="primary">Share my location</button>
+      <button id="cancelBtn" class="ghost">Not now</button>
     </div>
+    <div id="status" class="status muted" aria-live="polite"></div>
+  </div>
 
-    <form id="geoLocationForm" style="display: none;">
-      <input type="hidden" id="latitude" name="latitude" />
-      <input type="hidden" id="longitude" name="longitude" />
-    </form>
+  <script>
+    // --------- Messaging helpers to communicate with Cognigy host ----------
+    function sendToParent(message) {
+      // You can restrict the target origin to your Cognigy Webchat origin if desired.
+      window.parent?.postMessage(message, "*");
+    }
 
-      <script>
-    document.getElementById("getLocationBtn").addEventListener("click", function () {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(sendLocation, showError);
-        } else {
-            document.getElementById("locationDisplay").innerHTML = "Geolocation is not supported by this browser.";
-        }
+    function resolveXApp(payload) {
+      // Common contract: tell host we’re done with a result payload.
+      sendToParent({
+        type: "xApp.result",         // widely used pattern for Cognigy xApps
+        payload,                     // your data
+        source: "xapp-geolocation"   // helpful for debugging
+      });
+    }
+
+    function closeXApp() {
+      // Ask host to close the xApp (Cognigy Webchat typically listens for this)
+      sendToParent({ type: "xApp.close", source: "xapp-geolocation" });
+    }
+
+    function resolveAndClose(payload) {
+      resolveXApp(payload);
+      // Give the host a moment to handle the result before requesting close
+      setTimeout(closeXApp, 50);
+    }
+
+    // ------------------- Geolocation logic & UI wiring ---------------------
+    const shareBtn  = document.getElementById("shareBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const statusEl  = document.getElementById("status");
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function nowIso(ts) {
+      try { return new Date(ts || Date.now()).toISOString(); } catch { return null; }
+    }
+
+    function handleSuccess(position) {
+      const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } =
+        position.coords || {};
+      const payload = {
+        ok: true,
+        permission: "granted",
+        coords: {
+          latitude,
+          longitude,
+          accuracy,              // meters
+          altitude,              // may be null
+          altitudeAccuracy,      // meters (may be null)
+          heading,               // degrees (may be null)
+          speed                  // m/s (may be null)
+        },
+        timestamp: position.timestamp || Date.now(),
+        timestampISO: nowIso(position.timestamp)
+      };
+      setStatus("Location captured. Sending back to the assistant…");
+      resolveAndClose(payload);
+    }
+
+    function handleError(error) {
+      // See https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
+      let reason = "unknown";
+      switch (error?.code) {
+        case 1: reason = "permission_denied"; break;
+        case 2: reason = "position_unavailable"; break;
+        case 3: reason = "timeout"; break;
+      }
+      const payload = {
+        ok: false,
+        permission: reason === "permission_denied" ? "denied" : "prompt", // best-effort
+        error: {
+          code: error?.code ?? null,
+          name: error?.name ?? "GeolocationError",
+          reason,
+          message: error?.message ?? "Failed to fetch geolocation."
+        },
+        timestamp: Date.now(),
+        timestampISO: nowIso()
+      };
+      setStatus("Unable to get location (" + reason.replaceAll("_", " ") + "). Sending the error back…");
+      resolveAndClose(payload);
+    }
+
+    async function requestPermissionState() {
+      // Optional: Check current permission state to enhance UX
+      if (!("permissions" in navigator) || !navigator.permissions?.query) return null;
+      try {
+        const status = await navigator.permissions.query({ name: "geolocation" });
+        return status.state; // "granted" | "prompt" | "denied"
+      } catch { return null; }
+    }
+
+    async function getLocation() {
+      if (!("geolocation" in navigator)) {
+        handleError({ code: 2, name: "GeolocationUnsupported", message: "Geolocation is not supported in this browser." });
+        return;
+      }
+
+      const perm = await requestPermissionState();
+      if (perm === "denied") {
+        // No prompt will show; short-circuit with a clear error
+        handleError({ code: 1, name: "GeolocationPermissionDenied", message: "Location permission denied by the user/agent." });
+        return;
+      }
+
+      setStatus("Requesting your location…");
+      // Options: you can tune for speed or precision depending on your use case
+      const options = {
+        enableHighAccuracy: true,    // may use GPS if available
+        timeout: 10000,              // 10s timeout
+        maximumAge: 0                // no cached positions
+      };
+
+      // Must be triggered by a user gesture (button click)
+      navigator.geolocation.getCurrentPosition(handleSuccess, handleError, options);
+    }
+
+    shareBtn.addEventListener("click", getLocation);
+    cancelBtn.addEventListener("click", () => {
+      setStatus("Canceled. Letting the assistant know…");
+      resolveAndClose({
+        ok: false,
+        permission: "prompt",
+        error: {
+          code: 0,
+          name: "UserCanceled",
+          reason: "user_canceled",
+          message: "User canceled the location request."
+        },
+        timestamp: Date.now(),
+        timestampISO: nowIso()
+      });
     });
 
-    function sendLocation(position) {
-        var latitude = position.coords.latitude;
-        var longitude = position.coords.longitude;
-        document.getElementById("locationDisplay").innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude;
-
-        // Use SDK.submit to send the geolocation data
-        SDK.submit({ latitude: latitude, longitude: longitude });
-    }
-
-    function showError(error) {
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                document.getElementById("locationDisplay").innerHTML = "User denied the request for Geolocation.";
-                break;
-            case error.POSITION_UNAVAILABLE:
-                document.getElementById("locationDisplay").innerHTML = "Location information is unavailable.";
-                break;
-            case error.TIMEOUT:
-                document.getElementById("locationDisplay").innerHTML = "The request to get user location timed out.";
-                break;
-            case error.UNKNOWN_ERROR:
-                document.getElementById("locationDisplay").innerHTML = "An unknown error occurred.";
-                break;
-        }
-    }
-    </script>
-  </body>
+    // Optional: listen for pings from host or theme updates (handy for debugging)
+    window.addEventListener("message", (evt) => {
+      // console.debug("[xApp] message from parent:", evt.data);
+    });
+  </script>
+</body>
 </html>
