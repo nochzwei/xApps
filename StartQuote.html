@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Progressive Insurance - Auto Quote</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f6fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 650px;
+            background: white;
+            margin: 40px auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #007bff; /* Progressive blue */
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            background: #003da5; /* Progressive deep blue */
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #002c7a;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Auto Insurance Quote</h2>
+        <p>Please provide a few details so we can generate your personalized Progressive auto quote.</p>
+
+        <form id="quoteForm">
+
+            <!-- PERSONAL INFO -->
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" required />
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" required />
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" required />
+
+            <label for="zip">ZIP Code</label>
+            <input type="text" id="zip" required />
+
+            <!-- VEHICLE INFO -->
+            <h3 style="margin-top: 25px; color: #007bff;">Vehicle Information</h3>
+
+            <label for="year">Vehicle Year</label>
+            <input type="number" id="year" min="1980" max="2026" required />
+
+            <label for="make">Vehicle Make</label>
+            <input type="text" id="make" required />
+
+            <label for="model">Vehicle Model</label>
+            <input type="text" id="model" required />
+
+            <label for="ownership">Ownership Type</label>
+            <select id="ownership" required>
+                <option value="">Select...</option>
+                <option value="owned">Owned</option>
+                <option value="financed">Financed</option>
+                <option value="leased">Leased</option>
+            </select>
+
+            <!-- DRIVER INFO -->
+            <h3 style="margin-top: 25px; color: #007bff;">Driver Information</h3>
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" required />
+
+            <label for="licenseStatus">Driver’s License Status</label>
+            <select id="licenseStatus" required>
+                <option value="">Select...</option>
+                <option value="valid">Valid</option>
+                <option value="suspended">Suspended</option>
+                <option value="permit">Learner’s Permit</option>
+            </select>
+
+            <label for="accidents">Accidents in Last 5 Years</label>
+            <select id="accidents" required>
+                <option value="">Select...</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2+">2 or more</option>
+            </select>
+
+            <label for="mileage">Estimated Annual Mileage</label>
+            <input type="number" id="mileage" required />
+
+            <button type="submit">Get My Quote</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("quoteForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const data = {
+                fullName: document.getElementById("fullName").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                zip: document.getElementById("zip").value,
+
+                vehicle: {
+                    year: document.getElementById("year").value,
+                    make: document.getElementById("make").value,
+                    model: document.getElementById("model").value,
+                    ownership: document.getElementById("ownership").value
+                },
+
+                driver: {
+                    dob: document.getElementById("dob").value,
+                    licenseStatus: document.getElementById("licenseStatus").value,
+                    accidents: document.getElementById("accidents").value,
+                    mileage: document.getElementById("mileage").value
+                }
+            };
+
+            // For Cognigy xApp: send event back to flow
+            // window.parent.postMessage({ type: "xapp-form", payload: data }, "*");
+
+            alert("Your info has been submitted! We're calculating your Progressive auto quote.");
+            console.log("Quote Data:", data);
+        });
+    </script>
+</body>
+</html>
