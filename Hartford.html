@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Hartford | Insurance Claim Status</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
+    <!-- Brand / Logo -->
+    <div class="flex justify-center mb-4">
+      <!-- Replace with your approved asset path if needed -->
+      <img
+        src="https://assets.hartfordbusiness.com/wp-content/uploads/2025/04/screenshot_2025-02-06_7.45.04_am.png"
+        alt="The Hartford Logo"
+        class="h-16 w-auto"
+      >
+    </div>
+
+    <h1 class="text-xl font-bold text-gray-800 text-center">Insurance Claim Status</h1>
+
+    <!-- Hero / Context Image (Vehicle) -->
+    <div class="mt-4 space-y-3">
+      <div class="flex justify-center mb-4">
+        <img
+          src="data:image/jpeg;base64,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"
+          alt="Damaged Vehicle"
+          class="h-40 w-auto rounded-lg object-cover">
+      </div>
+
+      <!-- Claim Header Details -->
+      <p class="text-gray-700"><strong>Claim #:</strong> HFD-2026-004219</p>
+      <p class="text-gray-700"><strong>Claim Type:</strong> Auto – Collision</p>
+      <p class="text-gray-700"><strong>Policyholder:</strong> Chris White</p>
+      <p class="text-gray-700"><strong>Date of Loss:</strong> 02/28/2026</p>
+      <p class="text-gray-700"><strong>Vehicle:</strong> 2025 Chevy Suburban LT</p>
+      <p class="text-gray-700"><strong>Location of Loss:</strong> Omaha, NE</p>
+
+      <!-- Status Badge -->
+      <div class="flex items-center">
+        <span class="text-gray-700 font-semibold">Status:</span>
+        <span class="ml-2 inline-flex items-center rounded px-2 py-1 text-sm font-medium
+                     bg-red-100 text-red-800">
+          Under Review
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+               xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3"></path>
+          </svg>
+        </span>
+      </div>
+
+      <!-- Adjuster & Coverage -->
+      <div class="mt-3 grid grid-cols-1 gap-2">
+        <p class="text-gray-700">
+          <strong>Assigned Adjuster:</strong> Sarah Lee &middot;
+          <a href="tel:+14025551234" class="text-red-700 hover:underline">+1 (402) 555‑1234</a>
+        </p>
+        <p class="text-gray-700">
+          <strong>Comprehensive Deductible:</strong> $500
+        </p>
+        <p class="text-gray-700">
+          <strong>Collision Deductible:</strong> $1,000
+        </p>
+      </div>
+
+      <!-- Documents / Uploads -->
+      <div class="mt-4">
+        <p class="text-gray-800 font-semibold mb-2">Documents</p>
+
+        <!-- Police Report -->
+        <p class="text-gray-700 flex items-center">
+          <span class="font-medium">Police Report:</span>
+          <span class="bg-green-200 text-green-800 px-2 py-1 rounded flex items-center ml-2">
+            Uploaded
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 13l4 4L19 7"></path>
+            </svg>
+          </span>
+        </p>
+
+        <!-- Photos -->
+        <p class="text-gray-700 flex items-center">
+          <span class="font-medium">Accident Photos:</span>
+          <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded flex items-center ml-2">
+            Pending
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4m0 4h.01"></path>
+            </svg>
+          </span>
+        </p>
+
+        <!-- Estimate -->
+        <p class="text-gray-700 flex items-center">
+          <span class="font-medium">Repair Estimate:</span>
+          <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded flex items-center ml-2">
+            Not Submitted
+          </span>
+        </p>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="mt-4">
+        <p class="text-gray-800 font-semibold mb-2">Next Steps</p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1">
+          <li>Upload accident photos (front, rear, sides, interior if airbags deployed).</li>
+          <li>Select a preferred repair shop or request recommendations.</li>
+          <li>Schedule a virtual inspection if needed.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 grid grid-cols-1 gap-3">
+      <button
+        class="bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-red-800"
+        onclick="SDK.submit({ action: 'update-claim' })">
+        Update Claim
+      </button>
+
+      <button
+        class="bg-rose-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-rose-800"
+        onclick="SDK.submit({ action: 'add-photos' })">
+        Add Photos
+      </button>
+
+      <button
+        class="bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg shadow hover:bg-gray-300"
+        onclick="SDK.submit({ action: 'request-callback', preferredTime: 'asap' })">
+        Request Adjuster Callback
+      </button>
+    </div>
+
+    <!-- Optional Footer Note -->
+    <p class="text-xs text-gray-500 mt-4 text-center">
+      By continuing, you agree that The Hartford may contact you about your claim by phone, SMS, or email.
+    </p>
+  </div>
+
+  <!-- If not running inside an xApp runtime with SDK provided,
+       you can shim SDK for local testing. Remove in production. -->
+  <script>
+    if (typeof SDK === "undefined") {
+      window.SDK = {
+        submit: (payload) => {
+          alert("Submitting: " + JSON.stringify(payload, null, 2));
+          console.log("SDK.submit payload:", payload);
+        }
+      };
+    }
+  </script>
+</body>
+</html>
