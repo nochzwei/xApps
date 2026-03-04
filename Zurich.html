@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zurich | Commercial Property Claim Status</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #eef0f4;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1f2937;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 30rem;
+      overflow: hidden;
+    }
+
+    /* ── Header band ── */
+    .card-header {
+      background: #1a3a6b;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .card-header img { height: 3rem; width: auto; }
+    .card-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .card-header p {
+      font-size: 0.75rem;
+      color: #93c5fd;
+      margin-top: 0.15rem;
+    }
+
+    /* ── Hero image ── */
+    .hero img {
+      width: 100%;
+      height: 9rem;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── Sections ── */
+    .section {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .section:last-of-type { border-bottom: none; }
+
+    .section-heading {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 0.85rem;
+    }
+
+    /* ── Claim detail grid ── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem 1rem;
+    }
+    .detail-item { font-size: 0.85rem; }
+    .detail-item .label {
+      display: block;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      margin-bottom: 0.1rem;
+      font-weight: 500;
+    }
+    .detail-item .value { color: #1f2937; font-weight: 500; }
+    .detail-item.full { grid-column: 1 / -1; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge svg { width: 0.85rem; height: 0.85rem; flex-shrink: 0; }
+    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-yellow { background: #fef9c3; color: #92400e; }
+    .badge-gray   { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+
+    /* ── Coverage rows ── */
+    .coverage-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .coverage-row:last-child { border-bottom: none; }
+    .coverage-row .clabel { color: #6b7280; }
+    .coverage-row .cvalue { color: #1f2937; font-weight: 500; text-align: right; }
+    .coverage-row a { color: #2563eb; text-decoration: none; font-weight: 500; }
+    .coverage-row a:hover { text-decoration: underline; }
+
+    /* ── Document rows ── */
+    .doc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .doc-row:last-child { border-bottom: none; }
+    .doc-label { color: #374151; flex: 1; padding-right: 0.75rem; }
+
+    /* ── Next Steps ── */
+    .steps-list { list-style: none; padding: 0; }
+    .steps-list li {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      font-size: 0.85rem;
+      color: #374151;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f3f4f6;
+      line-height: 1.45;
+    }
+    .steps-list li:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 50%;
+      background: #1a3a6b;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.05rem;
+    }
+
+    /* ── Action buttons ── */
+    .actions {
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      gap: 0.6rem;
+      border-top: 2px solid #e5e7eb;
+    }
+    .btn {
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      width: 100%;
+      transition: filter 0.15s;
+    }
+    .btn:hover { filter: brightness(0.93); }
+    .btn-primary { background: #1a3a6b; color: #fff; }
+    .btn-sky     { background: #0284c7; color: #fff; }
+    .btn-indigo  { background: #4f46e5; color: #fff; }
+    .btn-outline { background: #fff; color: #374151; border: 1.5px solid #d1d5db; }
+
+    /* ── Footer ── */
+    .card-footer {
+      padding: 0.85rem 1.5rem;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.72rem;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <img src="https://images.credly.com/images/78ae370e-8547-4709-ae64-baf9d33f09bc/blob.png" alt="Zurich Insurance" />
+      <div>
+        <h1>Commercial Property Claim Status</h1>
+        <p>Claim #&nbsp;ZUR-2026-008731</p>
+      </div>
+    </div>
+
+    <!-- Hero Image -->
+    <div class="hero">
+      <img src="https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg" alt="Westbrook Plaza Tower A" />
+    </div>
+
+    <!-- Claim Details -->
+    <div class="section">
+      <p class="section-heading">Claim Details</p>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Insured Entity</span>
+          <span class="value">Westbrook Plaza, LLC</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Date of Loss</span>
+          <span class="value">02/14/2026</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Cause of Loss</span>
+          <span class="value">Wind/Hail (Severe Storm)</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Claim Type</span>
+          <span class="value">Commercial Property</span>
+        </div>
+        <div class="detail-item full">
+          <span class="label">Building</span>
+          <span class="value">Westbrook Plaza – Tower A (15 floors) · 1234 Market Street, Omaha, NE 68102</span>
+        </div>
+        <div class="detail-item full">
+          <span class="label">Status</span>
+          <span class="badge badge-blue">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
+            Under Review
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coverage & Adjuster -->
+    <div class="section">
+      <p class="section-heading">Coverage &amp; Adjuster</p>
+      <div class="coverage-row">
+        <span class="clabel">Assigned Adjuster</span>
+        <span class="cvalue">Daniel Ruiz · <a href="tel:+14025557654">(402) 555‑7654</a></span>
+      </div>
+      <div class="coverage-row">
+        <span class="clabel">Property Deductible</span>
+        <span class="cvalue">$25,000 (Wind/Hail)</span>
+      </div>
+      <div class="coverage-row">
+        <span class="clabel">BI Waiting Period</span>
+        <span class="cvalue">72 hours</span>
+      </div>
+      <div class="coverage-row">
+        <span class="clabel">Coverage</span>
+        <span class="cvalue">Building · BPP · BI/EE</span>
+      </div>
+    </div>
+
+    <!-- Documents & Tasks -->
+    <div class="section">
+      <p class="section-heading">Documents &amp; Tasks</p>
+      <div class="doc-row">
+        <span class="doc-label">First Notice of Loss (FNOL)</span>
+        <span class="badge badge-green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Received
+        </span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Schedule Adjuster Inspection</span>
+        <span class="badge badge-yellow">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01"/></svg>
+          Required
+        </span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Adjuster Report</span>
+        <span class="badge badge-gray">Not Available</span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Emergency Repairs / Mitigation Invoices</span>
+        <span class="badge badge-gray">Not Submitted</span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Contractor Repair Estimate</span>
+        <span class="badge badge-gray">Not Submitted</span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">BI Documentation (P&amp;L, payroll, leases)</span>
+        <span class="badge badge-gray">Not Submitted</span>
+      </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="section">
+      <p class="section-heading">Next Steps</p>
+      <ul class="steps-list">
+        <li><span class="step-num">1</span> Schedule an on-site or virtual inspection with the assigned adjuster.</li>
+        <li><span class="step-num">2</span> Review and confirm the Adjuster Report once it becomes available.</li>
+        <li><span class="step-num">3</span> Submit emergency mitigation invoices (tarping, water extraction, shoring).</li>
+        <li><span class="step-num">4</span> Provide a contractor repair estimate or request a Zurich vendor referral.</li>
+        <li><span class="step-num">5</span> For BI: upload recent P&amp;L statements, payroll reports, and lease schedules.</li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-primary" onclick="SDK.submit({ action: 'update-claim' })">Update Claim</button>
+      <button class="btn btn-sky"     onclick="SDK.submit({ action: 'schedule-inspection', method: 'onsite-or-virtual' })">Schedule Adjuster Inspection</button>
+      <button class="btn btn-indigo"  onclick="SDK.submit({ action: 'upload-docs', types: ['mitigation','contractor-estimate','bi-docs'] })">Upload Documents</button>
+      <button class="btn btn-outline" onclick="SDK.submit({ action: 'request-callback', preferredTime: 'asap' })">Request Adjuster Callback</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      By continuing, you agree that Zurich may contact you about your claim by phone, SMS, or email.
+    </div>
+
+  </div>
+
+  <script>
+    if (typeof SDK === "undefined") {
+      window.SDK = {
+        submit: (payload) => {
+          alert("Submitting: " + JSON.stringify(payload, null, 2));
+          console.log("SDK.submit payload:", payload);
+        }
+      };
+    }
+  </script>
+</body>
+</html>
