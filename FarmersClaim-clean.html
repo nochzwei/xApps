@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Farmers Insurance | Claim Status</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --farmers-red:    #C8102E;
+      --farmers-red-dk: #A00C24;
+      --farmers-navy:   #00205B;
+      --farmers-gold:   #F5A623;
+      --off-white:      #F7F8FA;
+      --border:         #DDE1E9;
+      --text-dark:      #1A1F36;
+      --text-mid:       #4A5568;
+      --text-light:     #718096;
+      --green-bg:       #EAFAF1;
+      --green-txt:      #1A6B3C;
+      --yellow-bg:      #FFF8E1;
+      --yellow-txt:     #7B5A00;
+      --gray-bg:        #F0F2F5;
+      --gray-txt:       #4A5568;
+      --radius:         10px;
+    }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: linear-gradient(135deg, #e8eaf2 0%, #f4f5f9 60%, #fce8e8 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,32,91,0.10), 0 2px 8px rgba(200,16,46,0.06);
+      width: 100%;
+      max-width: 440px;
+      overflow: hidden;
+      animation: slideUp 0.5s ease both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Header banner ── */
+    .card-header {
+      background: linear-gradient(135deg, var(--farmers-navy) 0%, #0a2e7a 100%);
+      padding: 22px 24px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--farmers-red) 0%, var(--farmers-gold) 100%);
+    }
+
+    .logo-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 18px;
+      display: inline-block;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--farmers-navy);
+      letter-spacing: 0.01em;
+    }
+
+    .logo-text span {
+      color: var(--farmers-red);
+    }
+
+    .logo-tagline {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--farmers-navy);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-top: -2px;
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Vehicle image ── */
+    .vehicle-img-wrap {
+      padding: 20px 24px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .vehicle-img-wrap img {
+      width: 100%;
+      max-height: 170px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+    }
+
+    /* ── Body ── */
+    .card-body {
+      padding: 20px 24px;
+    }
+
+    /* ── Info rows ── */
+    .info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-label {
+      color: var(--text-light);
+      font-weight: 500;
+      min-width: 120px;
+    }
+
+    .info-value {
+      color: var(--text-dark);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .info-value a {
+      color: var(--farmers-red);
+      text-decoration: none;
+    }
+
+    .info-value a:hover { text-decoration: underline; }
+
+    /* ── Status badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-review  { background: #FDECEA; color: var(--farmers-red); }
+    .badge-ok      { background: var(--green-bg); color: var(--green-txt); }
+    .badge-pending { background: var(--yellow-bg); color: var(--yellow-txt); }
+    .badge-none    { background: var(--gray-bg);   color: var(--gray-txt); }
+
+    /* ── Section heading ── */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--farmers-navy);
+      margin-top: 20px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--farmers-red);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Documents ── */
+    .doc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .doc-row:last-child { border-bottom: none; }
+
+    .doc-label {
+      color: var(--text-mid);
+      font-weight: 500;
+    }
+
+    /* ── Next steps ── */
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .steps-list li {
+      font-size: 14px;
+      color: var(--text-mid);
+      padding-left: 20px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .steps-list li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 7px;
+      width: 8px; height: 8px;
+      background: var(--farmers-red);
+      border-radius: 50%;
+    }
+
+    /* ── Deductible chips ── */
+    .deductible-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .chip-label {
+      color: var(--text-light);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .chip-value {
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* ── Buttons ── */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius);
+      padding: 13px 18px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+    }
+
+    .btn:hover  { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+    .btn:active { transform: translateY(0);    box-shadow: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--farmers-red) 0%, var(--farmers-red-dk) 100%);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(200,16,46,0.30);
+    }
+
+    .btn-primary:hover { background: linear-gradient(135deg, var(--farmers-red-dk) 0%, #880a1e 100%); }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--farmers-navy) 0%, #0a2e7a 100%);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(0,32,91,0.25);
+    }
+
+    .btn-ghost {
+      background: var(--off-white);
+      color: var(--farmers-navy);
+      border: 1.5px solid var(--border);
+    }
+
+    /* ── Footer ── */
+    .card-footer {
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: center;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    /* SVG icons inline */
+    .icon { width: 15px; height: 15px; vertical-align: middle; flex-shrink: 0; }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="logo-wrap">
+        <div class="logo-text">Farmers<span>®</span></div>
+        <div class="logo-tagline">Insurance Group</div>
+      </div>
+      <div class="page-title">Insurance Claim Status</div>
+    </div>
+
+    <!-- Vehicle image -->
+    <div class="vehicle-img-wrap">
+      <img
+        src="data:image/jpeg;base64,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"/IcNRgNo39A"
+        alt="Damaged Vehicle"
+      >
+    </div>
+
+    <!-- Card body -->
+    <div class="card-body">
+
+      <!-- Claim details -->
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-label">Claim #</span>
+          <span class="info-value">FMR-2026-004219</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Claim Type</span>
+          <span class="info-value">Auto – Collision</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Policyholder</span>
+          <span class="info-value">Chris White</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date of Loss</span>
+          <span class="info-value">02/28/2026</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Vehicle</span>
+          <span class="info-value">2025 Chevy Suburban LT</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Location</span>
+          <span class="info-value">Omaha, NE</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="info-value">
+            <span class="badge badge-review">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/>
+              </svg>
+              Under Review
+            </span>
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Adjuster</span>
+          <span class="info-value">
+            Sarah Lee ·
+            <a href="tel:+14025551234">+1 (402) 555‑1234</a>
+          </span>
+        </div>
+      </div>
+
+      <!-- Deductibles -->
+      <div class="section-title">Deductibles</div>
+      <div class="deductible-row">
+        <div class="chip">
+          <span class="chip-label">Comprehensive</span>
+          <span class="chip-value">$500</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Collision</span>
+          <span class="chip-value">$1,000</span>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="section-title">Documents</div>
+      <div class="doc-row">
+        <span class="doc-label">Police Report</span>
+        <span class="badge badge-ok">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Uploaded
+        </span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Accident Photos</span>
+        <span class="badge badge-pending">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01"/>
+          </svg>
+          Pending
+        </span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Repair Estimate</span>
+        <span class="badge badge-none">Not Submitted</span>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="section-title">Next Steps</div>
+      <ul class="steps-list">
+        <li>Upload accident photos (front, rear, sides, interior if airbags deployed).</li>
+        <li>Select a preferred repair shop or request recommendations.</li>
+        <li>Schedule a virtual inspection if needed.</li>
+      </ul>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn btn-primary" onclick="SDK.submit({ action: 'update-claim' })">
+          Update Claim
+        </button>
+        <button class="btn btn-secondary" onclick="SDK.submit({ action: 'add-photos' })">
+          Add Photos
+        </button>
+        <button class="btn btn-ghost" onclick="SDK.submit({ action: 'request-callback', preferredTime: 'asap' })">
+          Request Adjuster Callback
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      By continuing, you agree that Farmers Insurance may contact you about your claim by phone, SMS, or email.
+    </div>
+
+  </div>
+
+  <script>
+    if (typeof SDK === "undefined") {
+      window.SDK = {
+        submit: (payload) => {
+          alert("Submitting: " + JSON.stringify(payload, null, 2));
+          console.log("SDK.submit payload:", payload);
+        }
+      };
+    }
+  </script>
+</body>
+</html>
