@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zurich | Workers' Compensation Quote</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #eef0f4;
+      display: flex; align-items: flex-start; justify-content: center;
+      min-height: 100vh; padding: 2rem 1rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1f2937;
+    }
+    .card {
+      background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border-radius: 1rem; width: 100%; max-width: 30rem; overflow: hidden;
+    }
+    .card-header {
+      background: #1a3a6b; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .card-header img { height: 3rem; width: auto; }
+    .card-header h1 { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.3; }
+    .card-header p { font-size: 0.75rem; color: #93c5fd; margin-top: 0.15rem; }
+
+    .hero img { width: 100%; height: 9rem; object-fit: cover; display: block; }
+
+    .premium-banner {
+      background: #f0f7ff; border-bottom: 1px solid #bfdbfe;
+      padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
+    }
+    .premium-banner .label { font-size: 0.75rem; color: #6b7280; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+    .premium-banner .amount { font-size: 1.75rem; font-weight: 800; color: #1a3a6b; }
+    .premium-banner .per { font-size: 0.78rem; color: #6b7280; }
+    .badge-ready {
+      background: #dcfce7; color: #15803d; font-size: 0.75rem; font-weight: 700;
+      padding: 0.3rem 0.75rem; border-radius: 999px; display: flex; align-items: center; gap: 0.3rem;
+    }
+    .badge-ready svg { width: 0.8rem; height: 0.8rem; }
+
+    .section { padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
+    .section-heading {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #6b7280; margin-bottom: 0.85rem;
+    }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1rem; }
+    .detail-item { font-size: 0.85rem; }
+    .detail-item .label { display: block; font-size: 0.7rem; color: #9ca3af; margin-bottom: 0.1rem; font-weight: 500; }
+    .detail-item .value { color: #1f2937; font-weight: 500; }
+    .detail-item.full { grid-column: 1 / -1; }
+
+    /* Class code table */
+    .class-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .class-table thead tr { border-bottom: 2px solid #e5e7eb; }
+    .class-table th { text-align: left; font-size: 0.68rem; color: #9ca3af; font-weight: 600; padding-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .class-table th:last-child { text-align: right; }
+    .class-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+    .class-table tbody tr:last-child { border-bottom: none; }
+    .class-table td { padding: 0.45rem 0; color: #374151; vertical-align: top; }
+    .class-table td:last-child { text-align: right; font-weight: 600; color: #1a3a6b; }
+    .class-table .code-chip {
+      display: inline-block; background: #eff6ff; color: #1d4ed8;
+      border-radius: 0.25rem; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; margin-right: 0.3rem;
+    }
+
+    .coverage-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;
+    }
+    .coverage-row:last-child { border-bottom: none; }
+    .coverage-row .clabel { color: #6b7280; }
+    .coverage-row .cvalue { color: #1f2937; font-weight: 500; text-align: right; }
+
+    .endorse-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;
+    }
+    .endorse-row:last-child { border-bottom: none; }
+    .endorse-row .elabel { color: #374151; display: flex; align-items: center; gap: 0.4rem; }
+    .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #93c5fd; flex-shrink: 0; }
+    .dot.included { background: #6ee7b7; }
+    .endorse-row .eprice { color: #1f2937; font-weight: 600; }
+
+    .steps-list { list-style: none; padding: 0; }
+    .steps-list li {
+      display: flex; gap: 0.65rem; align-items: flex-start;
+      font-size: 0.85rem; color: #374151; padding: 0.5rem 0;
+      border-bottom: 1px solid #f3f4f6; line-height: 1.45;
+    }
+    .steps-list li:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0; width: 1.4rem; height: 1.4rem; border-radius: 50%;
+      background: #1a3a6b; color: #fff; font-size: 0.7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; margin-top: 0.05rem;
+    }
+
+    /* Experience Mod callout */
+    .mod-callout {
+      display: flex; align-items: center; gap: 1rem;
+      background: #fefce8; border: 1px solid #fde68a;
+      border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 0.85rem;
+    }
+    .mod-val { font-size: 1.5rem; font-weight: 800; color: #92400e; }
+    .mod-desc { font-size: 0.78rem; color: #92400e; line-height: 1.4; }
+
+    .actions { padding: 1.25rem 1.5rem; display: grid; gap: 0.6rem; border-top: 2px solid #e5e7eb; }
+    .btn {
+      font-weight: 600; padding: 0.65rem 1rem; border-radius: 0.5rem;
+      border: none; cursor: pointer; font-size: 0.9rem; width: 100%; transition: filter 0.15s;
+    }
+    .btn:hover { filter: brightness(0.93); }
+    .btn-primary { background: #1a3a6b; color: #fff; }
+    .btn-sky     { background: #0284c7; color: #fff; }
+    .btn-green   { background: #16a34a; color: #fff; }
+    .btn-outline { background: #fff; color: #374151; border: 1.5px solid #d1d5db; }
+
+    .card-footer {
+      padding: 0.85rem 1.5rem; background: #f9fafb; border-top: 1px solid #e5e7eb;
+      font-size: 0.72rem; color: #9ca3af; text-align: center; line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="card-header">
+      <img src="https://images.credly.com/images/78ae370e-8547-4709-ae64-baf9d33f09bc/blob.png" alt="Zurich Insurance" />
+      <div>
+        <h1>Workers' Compensation Quote</h1>
+        <p>Quote #&nbsp;ZUR-Q-2026-09044</p>
+      </div>
+    </div>
+
+    <div class="hero">
+      <img src="https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg" alt="Workers on site" />
+    </div>
+
+    <div class="premium-banner">
+      <div>
+        <div class="label">Annual Premium</div>
+        <div class="amount">$42,600</div>
+        <div class="per">$3,550 / month</div>
+      </div>
+      <div class="badge-ready">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        Ready for Review
+      </div>
+    </div>
+
+    <!-- Quote Summary -->
+    <div class="section">
+      <p class="section-heading">Quote Summary</p>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Applicant</span>
+          <span class="value">Summit Structural, LLC</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Effective Date</span>
+          <span class="value">04/01/2026</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Policy Term</span>
+          <span class="value">12 Months</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Quote Expires</span>
+          <span class="value">03/25/2026</span>
+        </div>
+        <div class="detail-item full">
+          <span class="label">Business Description</span>
+          <span class="value">Commercial Steel &amp; Concrete Contractor</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Total Employees</span>
+          <span class="value">134</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Total Annual Payroll</span>
+          <span class="value">$7,200,000</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Experience Mod -->
+    <div class="section">
+      <p class="section-heading">Experience Modification</p>
+      <div class="mod-callout">
+        <div class="mod-val">0.92</div>
+        <div class="mod-desc">Your experience modification rate is <strong>below 1.0</strong>, reflecting a better-than-average loss history. This results in an 8% credit on your manual premium.</div>
+      </div>
+      <div class="coverage-row"><span class="clabel">Manual Premium (pre-mod)</span><span class="cvalue">$46,300</span></div>
+      <div class="coverage-row"><span class="clabel">Experience Mod Credit (0.92)</span><span class="cvalue" style="color:#15803d;">– $3,700</span></div>
+      <div class="coverage-row"><span class="clabel">Final Annual Premium</span><span class="cvalue" style="font-size:1rem; font-weight:800; color:#1a3a6b;">$42,600</span></div>
+    </div>
+
+    <!-- Class Codes & Payroll -->
+    <div class="section">
+      <p class="section-heading">Class Codes &amp; Payroll</p>
+      <table class="class-table">
+        <thead>
+          <tr>
+            <th>Class / Description</th>
+            <th style="text-align:right;">Payroll</th>
+            <th style="text-align:right;">Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="code-chip">5040</span>Iron / Steel – Structural</td>
+            <td style="text-align:right;">$3,100,000</td>
+            <td style="text-align:right;">$8.42</td>
+          </tr>
+          <tr>
+            <td><span class="code-chip">5213</span>Concrete Construction</td>
+            <td style="text-align:right;">$2,400,000</td>
+            <td style="text-align:right;">$6.18</td>
+          </tr>
+          <tr>
+            <td><span class="code-chip">5606</span>Contractors – Supervisors</td>
+            <td style="text-align:right;">$980,000</td>
+            <td style="text-align:right;">$3.55</td>
+          </tr>
+          <tr>
+            <td><span class="code-chip">8810</span>Clerical / Office</td>
+            <td style="text-align:right;">$720,000</td>
+            <td style="text-align:right;">$0.28</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Coverage Details -->
+    <div class="section">
+      <p class="section-heading">Coverage Details</p>
+      <div class="coverage-row"><span class="clabel">Statutory WC Benefits</span><span class="cvalue">Unlimited (state statutory)</span></div>
+      <div class="coverage-row"><span class="clabel">Employers Liability – Each Accident</span><span class="cvalue">$1,000,000</span></div>
+      <div class="coverage-row"><span class="clabel">Employers Liability – Disease, Per Employee</span><span class="cvalue">$1,000,000</span></div>
+      <div class="coverage-row"><span class="clabel">Employers Liability – Disease, Policy Limit</span><span class="cvalue">$1,000,000</span></div>
+      <div class="coverage-row"><span class="clabel">States Covered</span><span class="cvalue">NE, IA, KS, MO</span></div>
+    </div>
+
+    <!-- Endorsements -->
+    <div class="section">
+      <p class="section-heading">Endorsements &amp; Add-ons</p>
+      <div class="endorse-row">
+        <span class="elabel"><span class="dot included"></span>Waiver of Subrogation – Blanket</span>
+        <span class="eprice">Included</span>
+      </div>
+      <div class="endorse-row">
+        <span class="elabel"><span class="dot included"></span>All States Endorsement</span>
+        <span class="eprice">Included</span>
+      </div>
+      <div class="endorse-row">
+        <span class="elabel"><span class="dot"></span>Stop Gap (ND / OH / WA / WY)</span>
+        <span class="eprice">+$620/yr</span>
+      </div>
+      <div class="endorse-row">
+        <span class="elabel"><span class="dot"></span>Volunteer Coverage</span>
+        <span class="eprice">+$280/yr</span>
+      </div>
+      <div class="endorse-row">
+        <span class="elabel"><span class="dot"></span>USL&amp;H – Maritime Extension</span>
+        <span class="eprice">+$1,400/yr</span>
+      </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="section">
+      <p class="section-heading">Next Steps</p>
+      <ul class="steps-list">
+        <li><span class="step-num">1</span> Confirm payroll figures and class code assignments with your payroll provider.</li>
+        <li><span class="step-num">2</span> Review states covered — add Stop Gap if operations extend to monopolistic states.</li>
+        <li><span class="step-num">3</span> Sign and return the payroll audit agreement included with your policy.</li>
+        <li><span class="step-num">4</span> Bind and set up pay-as-you-go billing linked to your payroll cycle.</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-green"   onclick="SDK.submit({ action: 'bind-quote', quoteNumber: 'ZUR-Q-2026-09044' })">Bind This Quote</button>
+      <button class="btn btn-primary" onclick="SDK.submit({ action: 'modify-coverage' })">Modify Payroll / Classes</button>
+      <button class="btn btn-sky"     onclick="SDK.submit({ action: 'add-endorsements' })">Add Endorsements</button>
+      <button class="btn btn-outline" onclick="SDK.submit({ action: 'request-callback' })">Speak with an Agent</button>
+    </div>
+
+    <div class="card-footer">
+      This quote is valid through 03/25/2026. Final premium is subject to payroll audit at policy expiration.
+    </div>
+  </div>
+
+  <script>
+    if (typeof SDK === "undefined") {
+      window.SDK = { submit: (p) => alert("SDK: " + JSON.stringify(p, null, 2)) };
+    }
+  </script>
+</body>
+</html>
