@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Progressive Insurance | Share Your Location</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --prog-blue:      #0066CC;
+      --prog-blue-dk:   #0052A3;
+      --prog-blue-lt:   #E6F0FA;
+      --prog-navy:      #003087;
+      --prog-navy-dk:   #001F5B;
+      --off-white:      #F5F7FA;
+      --border:         #D8E0EC;
+      --text-dark:      #0D1B35;
+      --text-mid:       #3A4D6B;
+      --text-light:     #6B7FA3;
+      --green:          #1A8A4A;
+      --green-bg:       #E6F7EE;
+      --red:            #CC2200;
+      --red-bg:         #FDECEA;
+      --radius:         14px;
+      --shadow:         0 10px 48px rgba(0,48,135,0.13), 0 2px 10px rgba(0,102,204,0.08);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: linear-gradient(160deg, #c8ddf7 0%, #e8f0fb 45%, #dce8f9 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+    }
+
+    /* Animated background rings */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,102,204,0.12) 0%, transparent 70%);
+      animation: pulse 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -80px; left: -80px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,48,135,0.10) 0%, transparent 70%);
+      animation: pulse 6s ease-in-out infinite reverse;
+      pointer-events: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.7; }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+      animation: slideUp 0.55s cubic-bezier(.22,.68,0,1.2) both;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Header ── */
+    .card-header {
+      background: linear-gradient(140deg, var(--prog-navy) 0%, #0044aa 100%);
+      padding: 24px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--prog-blue) 0%, #33AAFF 100%);
+    }
+
+    .logo-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 7px 16px 7px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .logo-mark {
+      width: 30px; height: 30px;
+      background: var(--prog-blue);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-mark svg { width: 18px; height: 18px; }
+
+    .logo-text-wrap { line-height: 1.1; }
+
+    .logo-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--prog-navy);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .logo-tagline {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--prog-blue);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .header-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.92);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Map pin icon ── */
+    .pin-wrap {
+      padding: 28px 24px 8px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pin-icon {
+      width: 80px; height: 80px;
+      background: var(--prog-blue-lt);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: pinBounce 2.5s ease-in-out infinite;
+    }
+
+    .pin-icon::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%; transform: translateX(-50%);
+      width: 24px; height: 8px;
+      background: rgba(0,102,204,0.12);
+      border-radius: 50%;
+    }
+
+    @keyframes pinBounce {
+      0%, 100% { transform: translateY(0); }
+      45%       { transform: translateY(-8px); }
+      60%       { transform: translateY(-5px); }
+    }
+
+    .pin-icon svg { width: 40px; height: 40px; }
+
+    /* ── Body ── */
+    .card-body { padding: 10px 24px 24px; }
+
+    .body-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--prog-navy);
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .body-desc {
+      font-size: 14px;
+      color: var(--text-mid);
+      text-align: center;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    /* ── Status area ── */
+    .status-box {
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 18px;
+      min-height: 52px;
+      transition: all 0.3s ease;
+    }
+
+    .status-box.idle {
+      background: var(--prog-blue-lt);
+      color: var(--prog-blue-dk);
+      border: 1.5px solid #b3d0f0;
+    }
+
+    .status-box.loading {
+      background: #FFF8E0;
+      color: #7A5800;
+      border: 1.5px solid #f5d580;
+    }
+
+    .status-box.success {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1.5px solid #a3dcb8;
+    }
+
+    .status-box.error {
+      background: var(--red-bg);
+      color: var(--red);
+      border: 1.5px solid #f5b3a8;
+    }
+
+    .status-icon { flex-shrink: 0; margin-top: 1px; }
+
+    .status-content { flex: 1; }
+
+    .status-label {
+      font-weight: 700;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .status-detail {
+      font-size: 12.5px;
+      line-height: 1.4;
+      opacity: 0.85;
+    }
+
+    /* ── Location result ── */
+    .location-result {
+      display: none;
+      background: var(--off-white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      gap: 0;
+    }
+
+    .location-result.visible { display: block; }
+
+    .loc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13.5px;
+    }
+
+    .loc-row:last-child { border-bottom: none; }
+
+    .loc-label {
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .loc-value {
+      color: var(--text-dark);
+      font-weight: 700;
+      text-align: right;
+      font-size: 13px;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(120,100,0,0.25);
+      border-top-color: #7A5800;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Button ── */
+    .btn-share {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius);
+      padding: 15px 18px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--prog-blue) 0%, var(--prog-blue-dk) 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(0,102,204,0.32);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.14s, box-shadow 0.14s, background 0.15s;
+    }
+
+    .btn-share:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,102,204,0.38);
+      background: linear-gradient(135deg, #0077e6 0%, var(--prog-blue) 100%);
+    }
+
+    .btn-share:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(0,102,204,0.2);
+    }
+
+    .btn-share:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-share svg { width: 20px; height: 20px; }
+
+    /* Retry button */
+    .btn-retry {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--off-white);
+      color: var(--prog-navy);
+      margin-top: 10px;
+      transition: background 0.15s, transform 0.12s;
+      display: none;
+    }
+
+    .btn-retry.visible { display: block; }
+    .btn-retry:hover { background: var(--prog-blue-lt); transform: translateY(-1px); }
+
+    /* ── Privacy note ── */
+    .privacy-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: var(--prog-blue-lt);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--text-mid);
+      line-height: 1.45;
+    }
+
+    .privacy-note svg { flex-shrink: 0; margin-top: 1px; width: 14px; height: 14px; color: var(--prog-blue); }
+
+    /* ── Footer ── */
+    .card-footer {
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: center;
+      padding: 12px 24px 18px;
+      border-top: 1px solid var(--border);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="logo-wrap">
+      <div class="logo-mark">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="2" y="16" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="18" fill="white">P</text>
+        </svg>
+      </div>
+      <div class="logo-text-wrap">
+        <div class="logo-text">Progressive</div>
+        <div class="logo-tagline">Insurance</div>
+      </div>
+    </div>
+    <div class="header-title">Claim Location Verification</div>
+  </div>
+
+  <!-- Pin animation -->
+  <div class="pin-wrap">
+    <div class="pin-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#0066CC"/>
+        <circle cx="12" cy="9" r="2.5" fill="white"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+
+    <div class="body-title">Share Your Location</div>
+    <div class="body-desc">
+      To help process your claim, your Progressive adjuster needs to verify your current location or the location of the incident.
+    </div>
+
+    <!-- Status box -->
+    <div class="status-box idle" id="statusBox">
+      <div class="status-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="status-content">
+        <span class="status-label" id="statusLabel">Ready</span>
+        <span class="status-detail" id="statusDetail">Tap the button below to share your GPS location securely.</span>
+      </div>
+    </div>
+
+    <!-- Location result panel -->
+    <div class="location-result" id="locationResult">
+      <div class="loc-row">
+        <span class="loc-label">Latitude</span>
+        <span class="loc-value" id="locLat">—</span>
+      </div>
+      <div class="loc-row">
+        <span class="loc-label">Longitude</span>
+        <span class="loc-value" id="locLng">—</span>
+      </div>
+      <div class="loc-row">
+        <span class="loc-label">Accuracy</span>
+        <span class="loc-value" id="locAccuracy">—</span>
+      </div>
+      <div class="loc-row">
+        <span class="loc-label">Captured At</span>
+        <span class="loc-value" id="locTime">—</span>
+      </div>
+    </div>
+
+    <!-- Share button -->
+    <button class="btn-share" id="btnShare" onclick="requestLocation()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+        <circle cx="12" cy="9" r="2.5"/>
+      </svg>
+      Share My Location
+    </button>
+
+    <!-- Retry button -->
+    <button class="btn-retry" id="btnRetry" onclick="resetState()">Try Again</button>
+
+    <!-- Privacy note -->
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <span>Your location is shared only with your assigned Progressive adjuster and used solely for claim processing. It is not stored or sold.</span>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer">
+    By sharing your location, you agree to Progressive's Privacy Policy. For questions, call 1-800-776-4737.
+  </div>
+
+</div>
+
+<script>
+  // ── State references ──────────────────────────────────────────────
+  const statusBox    = document.getElementById('statusBox');
+  const statusLabel  = document.getElementById('statusLabel');
+  const statusDetail = document.getElementById('statusDetail');
+  const locResult    = document.getElementById('locationResult');
+  const btnShare     = document.getElementById('btnShare');
+  const btnRetry     = document.getElementById('btnRetry');
+
+  // ── Set status helper ─────────────────────────────────────────────
+  function setStatus(type, label, detail) {
+    statusBox.className = 'status-box ' + type;
+
+    const icons = {
+      idle: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+      loading: `<div class="spinner"></div>`,
+      success: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+      error: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+    };
+
+    document.querySelector('.status-icon').innerHTML = icons[type] || icons.idle;
+    statusLabel.textContent  = label;
+    statusDetail.textContent = detail;
+  }
+
+  // ── Reset ─────────────────────────────────────────────────────────
+  function resetState() {
+    setStatus('idle', 'Ready', 'Tap the button below to share your GPS location securely.');
+    locResult.classList.remove('visible');
+    btnShare.disabled = false;
+    btnShare.style.display = 'flex';
+    btnRetry.classList.remove('visible');
+  }
+
+  // ── Format time ───────────────────────────────────────────────────
+  function formatTime(date) {
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  // ── Request location ──────────────────────────────────────────────
+  function requestLocation() {
+    if (!navigator.geolocation) {
+      setStatus('error', 'Not Supported', 'Geolocation is not supported by your browser or device.');
+      btnShare.disabled = true;
+      btnRetry.classList.remove('visible');
+      return;
+    }
+
+    // Loading state
+    setStatus('loading', 'Locating…', 'Please allow location access when prompted by your browser.');
+    btnShare.disabled = true;
+    locResult.classList.remove('visible');
+
+    navigator.geolocation.getCurrentPosition(
+      // ── Success ──
+      function(position) {
+        const { latitude, longitude, accuracy } = position.coords;
+        const capturedAt = new Date();
+
+        // Populate result rows
+        document.getElementById('locLat').textContent      = latitude.toFixed(6) + '°';
+        document.getElementById('locLng').textContent      = longitude.toFixed(6) + '°';
+        document.getElementById('locAccuracy').textContent = Math.round(accuracy) + ' meters';
+        document.getElementById('locTime').textContent     = formatTime(capturedAt);
+
+        locResult.classList.add('visible');
+
+        setStatus('success', 'Location Captured', 'Your location has been shared with your adjuster successfully.');
+
+        btnShare.style.display = 'none';
+        btnRetry.classList.add('visible');
+        btnRetry.textContent = 'Share Again';
+
+        // ── Send to Cognigy via SDK ──
+        const payload = {
+          action: 'location-captured',
+          latitude:  latitude,
+          longitude: longitude,
+          accuracy:  accuracy,
+          capturedAt: capturedAt.toISOString()
+        };
+
+        if (typeof SDK !== 'undefined') {
+          SDK.submit(payload);
+        } else {
+          console.log('SDK.submit payload:', payload);
+        }
+      },
+
+      // ── Error ──
+      function(error) {
+        let label  = 'Location Error';
+        let detail = 'Unable to retrieve your location.';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            label  = 'Permission Denied';
+            detail = 'You denied location access. Please enable location permissions in your browser settings, then try again.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            label  = 'Position Unavailable';
+            detail = 'Your device could not determine your location. Please check your GPS or network connection.';
+            break;
+          case error.TIMEOUT:
+            label  = 'Request Timed Out';
+            detail = 'Location request took too long. Please try again in a moment.';
+            break;
+        }
+
+        setStatus('error', label, detail);
+        btnShare.disabled = false;
+        btnShare.style.display = 'flex';
+        btnRetry.classList.add('visible');
+        btnRetry.textContent = 'Try Again';
+
+        if (typeof SDK !== 'undefined') {
+          SDK.submit({ action: 'location-error', errorCode: error.code, errorMessage: error.message });
+        }
+      },
+
+      // ── Options ──
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  }
+
+  // ── Stub SDK for dev/preview ──────────────────────────────────────
+  if (typeof SDK === 'undefined') {
+    window.SDK = {
+      submit: function(payload) {
+        console.log('SDK.submit payload:', JSON.stringify(payload, null, 2));
+      }
+    };
+  }
+</script>
+
+</body>
+</html>
