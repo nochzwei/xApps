@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Farmers Insurance | Claim Status</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --farmers-red:    #C8102E;
+      --farmers-red-dk: #A00C24;
+      --farmers-navy:   #00205B;
+      --farmers-gold:   #F5A623;
+      --off-white:      #F7F8FA;
+      --border:         #DDE1E9;
+      --text-dark:      #1A1F36;
+      --text-mid:       #4A5568;
+      --text-light:     #718096;
+      --green-bg:       #EAFAF1;
+      --green-txt:      #1A6B3C;
+      --yellow-bg:      #FFF8E1;
+      --yellow-txt:     #7B5A00;
+      --gray-bg:        #F0F2F5;
+      --gray-txt:       #4A5568;
+      --radius:         10px;
+    }
+
+    body {
+      font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e8eaf2 0%, #f4f5f9 60%, #fce8e8 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,32,91,0.10), 0 2px 8px rgba(200,16,46,0.06);
+      width: 100%;
+      max-width: 440px;
+      overflow: hidden;
+      animation: slideUp 0.5s ease both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--farmers-navy) 0%, #0a2e7a 100%);
+      padding: 22px 24px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--farmers-red) 0%, var(--farmers-gold) 100%);
+    }
+
+    .logo-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 18px;
+      display: inline-block;
+    }
+
+    .page-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
+
+    .vehicle-img-wrap {
+      padding: 20px 24px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .vehicle-img-wrap img {
+      width: 100%;
+      max-height: 170px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+    }
+
+    .card-body { padding: 20px 24px; }
+
+    .info-grid { display: flex; flex-direction: column; gap: 8px; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-label { color: var(--text-light); font-weight: 500; min-width: 120px; }
+    .info-value { color: var(--text-dark); font-weight: 600; text-align: right; }
+    .info-value a { color: var(--farmers-red); text-decoration: none; }
+    .info-value a:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-review  { background: #FDECEA; color: var(--farmers-red); }
+    .badge-ok      { background: var(--green-bg); color: var(--green-txt); }
+    .badge-pending { background: var(--yellow-bg); color: var(--yellow-txt); }
+    .badge-none    { background: var(--gray-bg); color: var(--gray-txt); }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--farmers-navy);
+      margin-top: 20px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--farmers-red);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .doc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .doc-row:last-child { border-bottom: none; }
+    .doc-label { color: var(--text-mid); font-weight: 500; }
+
+    .steps-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
+    .steps-list li { font-size: 14px; color: var(--text-mid); padding-left: 20px; position: relative; line-height: 1.5; }
+    .steps-list li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 7px;
+      width: 8px; height: 8px;
+      background: var(--farmers-red);
+      border-radius: 50%;
+    }
+
+    .deductible-row { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+
+    .chip {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .chip-label { color: var(--text-light); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; display: block; margin-bottom: 2px; }
+    .chip-value { color: var(--text-dark); font-weight: 700; font-size: 15px; }
+
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius);
+      padding: 13px 18px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+    }
+
+    .btn:hover  { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--farmers-red) 0%, var(--farmers-red-dk) 100%);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(200,16,46,0.30);
+    }
+
+    .btn-primary:hover { background: linear-gradient(135deg, var(--farmers-red-dk) 0%, #880a1e 100%); }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--farmers-navy) 0%, #0a2e7a 100%);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(0,32,91,0.25);
+    }
+
+    .btn-ghost {
+      background: var(--off-white);
+      color: var(--farmers-navy);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-sm {
+      padding: 9px 14px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .card-footer {
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: center;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    .icon { width: 15px; height: 15px; vertical-align: middle; flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════════════
+       MODAL OVERLAY
+    ═══════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,20,60,0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-sheet {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 440px;
+      padding: 0 0 32px;
+      transform: translateY(40px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 12px auto 0;
+    }
+
+    .modal-header {
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--farmers-navy);
+    }
+
+    .modal-close {
+      background: var(--gray-bg);
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-mid);
+      font-size: 18px;
+      line-height: 1;
+      transition: background 0.15s;
+    }
+
+    .modal-close:hover { background: var(--border); }
+
+    .modal-body { padding: 20px 24px; }
+
+    /* ═══════════════════════════════════════════════
+       FORM ELEMENTS
+    ═══════════════════════════════════════════════ */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-dark);
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      appearance: none;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--farmers-navy);
+      box-shadow: 0 0 0 3px rgba(0,32,91,0.10);
+    }
+
+    .form-textarea { resize: vertical; min-height: 80px; }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+
+    /* ═══════════════════════════════════════════════
+       PHOTO UPLOAD
+    ═══════════════════════════════════════════════ */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--farmers-red);
+      background: #FFF5F5;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--gray-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .upload-icon svg { width: 22px; height: 22px; color: var(--text-mid); }
+
+    .upload-title { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .upload-sub { font-size: 12px; color: var(--text-light); }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-thumb .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .photo-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: var(--green-txt);
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 4px 10px;
+      margin-top: 10px;
+    }
+
+    .photo-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 14px 0 6px;
+    }
+
+    .category-chip {
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-mid);
+      cursor: pointer;
+      background: #fff;
+      transition: all 0.15s;
+    }
+
+    .category-chip.active {
+      border-color: var(--farmers-red);
+      background: #FFF0F2;
+      color: var(--farmers-red);
+    }
+
+    /* ═══════════════════════════════════════════════
+       REPAIR SHOP CARDS
+    ═══════════════════════════════════════════════ */
+    .shop-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+    .shop-card {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .shop-card:hover { border-color: var(--farmers-navy); }
+
+    .shop-card.selected {
+      border-color: var(--farmers-red);
+      background: #FFF5F6;
+    }
+
+    .shop-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 22px;
+      height: 22px;
+      background: var(--farmers-red);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .shop-name { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+    .shop-meta { font-size: 12px; color: var(--text-light); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+
+    .shop-meta span { display: flex; align-items: center; gap: 3px; }
+
+    .star { color: var(--farmers-gold); }
+
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .time-slot {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-mid);
+      transition: all 0.15s;
+      background: #fff;
+    }
+
+    .time-slot:hover { border-color: var(--farmers-navy); color: var(--farmers-navy); }
+
+    .time-slot.selected {
+      border-color: var(--farmers-red);
+      background: var(--farmers-red);
+      color: #fff;
+    }
+
+    .time-slot .slot-date { font-size: 10px; font-weight: 500; color: inherit; opacity: 0.75; display: block; margin-bottom: 2px; }
+    .time-slot.selected .slot-date { opacity: 0.85; }
+
+    /* ═══════════════════════════════════════════════
+       CALLBACK SCHEDULER
+    ═══════════════════════════════════════════════ */
+    .callback-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .callback-option {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .callback-option:hover { border-color: var(--farmers-navy); }
+
+    .callback-option.selected {
+      border-color: var(--farmers-red);
+      background: #FFF5F6;
+    }
+
+    .callback-option-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gray-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .callback-option.selected .callback-option-icon {
+      background: var(--farmers-red);
+      color: #fff;
+    }
+
+    .callback-option-icon svg { width: 18px; height: 18px; }
+    .callback-option-label { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+    .callback-option-sub { font-size: 12px; color: var(--text-light); }
+
+    .radio-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .callback-option.selected .radio-dot {
+      border-color: var(--farmers-red);
+      background: var(--farmers-red);
+      box-shadow: inset 0 0 0 3px #fff;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SUCCESS STATE
+    ═══════════════════════════════════════════════ */
+    .success-state {
+      text-align: center;
+      padding: 24px 0 8px;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--green-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .success-icon svg { width: 32px; height: 32px; color: var(--green-txt); }
+    .success-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .success-sub { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+
+    .summary-box {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 16px;
+      text-align: left;
+    }
+
+    .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
+    .summary-label { color: var(--text-light); }
+    .summary-value { color: var(--text-dark); font-weight: 600; }
+
+    /* ═══════════════════════════════════════════════
+       LOADING
+    ═══════════════════════════════════════════════ */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ═══════════════════════════════════════════════
+       STEP INDICATOR
+    ═══════════════════════════════════════════════ */
+    .step-indicator {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.2s;
+    }
+
+    .step-dot.active {
+      background: var(--farmers-red);
+      width: 20px;
+      border-radius: 4px;
+    }
+
+    .step-dot.done { background: var(--farmers-navy); }
+
+    .hint-text {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <!-- Header -->
+    <div class="card-header">
+      <div class="logo-wrap">
+        <img
+          src="https://logos-world.net/wp-content/uploads/2023/02/Farmers-Insurance-Symbol.png"
+          alt="Farmers Insurance"
+          style="height: 48px; width: auto; display: block;"
+        >
+      </div>
+      <div class="page-title">Insurance Claim Status</div>
+    </div>
+
+    <!-- Vehicle image -->
+    <div class="vehicle-img-wrap">
+      <img
+        src="https://di-uploads-pod25.dealerinspire.com/rickhendrickcitychevy/uploads/2025/01/mlp-img-top-2025-suburban.png"
+        alt="Damaged Vehicle"
+      >
+    </div>
+
+    <!-- Card body -->
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-label">Claim #</span>
+          <span class="info-value">FMR-2026-004219</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Claim Type</span>
+          <span class="info-value">Auto – Collision</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Policyholder</span>
+          <span class="info-value">Chris White</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date of Loss</span>
+          <span class="info-value">03/12/2026</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Vehicle</span>
+          <span class="info-value">2025 Chevy Suburban LT</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Location</span>
+          <span class="info-value">Omaha, NE</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="info-value">
+            <span class="badge badge-review">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/>
+              </svg>
+              Under Review
+            </span>
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Adjuster</span>
+          <span class="info-value">
+            Sarah Lee ·
+            <a href="tel:+14025551234">+1 (402) 555‑1234</a>
+          </span>
+        </div>
+      </div>
+
+      <!-- Deductibles -->
+      <div class="section-title">Deductibles</div>
+      <div class="deductible-row">
+        <div class="chip">
+          <span class="chip-label">Comprehensive</span>
+          <span class="chip-value">$500</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Collision</span>
+          <span class="chip-value">$1,000</span>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="section-title">Documents</div>
+      <div class="doc-row">
+        <span class="doc-label">Police Report</span>
+        <span class="badge badge-ok" id="doc-police">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Uploaded
+        </span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Accident Photos</span>
+        <span class="badge badge-pending" id="doc-photos">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01"/>
+          </svg>
+          Pending
+        </span>
+      </div>
+      <div class="doc-row">
+        <span class="doc-label">Repair Estimate</span>
+        <span class="badge badge-none" id="doc-estimate">Not Submitted</span>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="section-title">Next Steps</div>
+      <ul class="steps-list">
+        <li>Upload accident photos (front, rear, sides, interior if airbags deployed).</li>
+        <li>Schedule a repair estimate at an authorized local shop.</li>
+        <li>Request an adjuster callback if you have questions.</li>
+      </ul>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn btn-primary" onclick="openModal('repair')">
+          📅 Schedule Repair Estimate
+        </button>
+        <button class="btn btn-secondary" onclick="openModal('photos')">
+          📷 Add Photos
+        </button>
+        <button class="btn btn-ghost" onclick="openModal('callback')">
+          📞 Request Adjuster Callback
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      By continuing, you agree that Farmers Insurance may contact you about your claim by phone, SMS, or email.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL: ADD PHOTOS
+  ═══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-photos">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <span class="modal-title">📷 Add Accident Photos</span>
+        <button class="modal-close" onclick="closeModal('photos')">×</button>
+      </div>
+      <div class="modal-body" id="photos-body">
+
+        <div class="step-indicator">
+          <div class="step-dot active" id="photos-step1"></div>
+          <div class="step-dot" id="photos-step2"></div>
+        </div>
+
+        <!-- Step 1: Select categories & upload -->
+        <div id="photos-step-1">
+          <p class="form-label">Photo Categories (select all that apply)</p>
+          <div class="photo-categories">
+            <span class="category-chip" onclick="toggleCategory(this)">Front Damage</span>
+            <span class="category-chip" onclick="toggleCategory(this)">Rear Damage</span>
+            <span class="category-chip" onclick="toggleCategory(this)">Side Damage</span>
+            <span class="category-chip" onclick="toggleCategory(this)">Interior</span>
+            <span class="category-chip" onclick="toggleCategory(this)">Airbag Deployed</span>
+            <span class="category-chip" onclick="toggleCategory(this)">Other</span>
+          </div>
+
+          <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <input type="file" accept="image/*" multiple onchange="handleFileSelect(event)" id="file-input">
+            <div class="upload-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4-4 4 4 4-6 4 6M3 20h18M9 8a2 2 0 110-4 2 2 0 010 4z"/>
+              </svg>
+            </div>
+            <div class="upload-title">Tap to upload or drag & drop</div>
+            <div class="upload-sub">JPG, PNG, HEIC up to 10MB each</div>
+          </div>
+
+          <div class="photo-grid" id="photo-grid"></div>
+          <div id="photo-count-display"></div>
+
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="photosNext()" id="photos-next-btn" disabled>
+              Continue →
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Confirm & submit -->
+        <div id="photos-step-2" style="display:none;">
+          <div class="success-state">
+            <div class="success-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="success-title">Ready to Submit</div>
+            <div class="success-sub">Your photos have been selected and will be securely uploaded to your claim.</div>
+          </div>
+          <div class="summary-box" id="photos-summary"></div>
+          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-primary" onclick="submitPhotos()" id="photos-submit-btn">
+              Submit Photos
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="photosBack()">← Back</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL: SCHEDULE REPAIR ESTIMATE
+  ═══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-repair">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <span class="modal-title">📅 Schedule Repair Estimate</span>
+        <button class="modal-close" onclick="closeModal('repair')">×</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="step-indicator">
+          <div class="step-dot active" id="repair-step1"></div>
+          <div class="step-dot" id="repair-step2"></div>
+          <div class="step-dot" id="repair-step3"></div>
+        </div>
+
+        <!-- Step 1: Choose shop -->
+        <div id="repair-step-1">
+          <p class="form-label">Authorized Repair Shops Near Omaha, NE</p>
+
+          <div class="shop-list">
+            <div class="shop-card" onclick="selectShop(this, 'Omaha Auto Body & Collision', '2341 S 42nd St, Omaha', '4.8', '0.8 mi')" id="shop-1">
+              <div class="shop-name">Omaha Auto Body & Collision</div>
+              <div class="shop-meta">
+                <span><span class="star">★</span> 4.8</span>
+                <span>📍 0.8 mi · 2341 S 42nd St</span>
+                <span>⏱ Est. 3–5 days</span>
+              </div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, 'Heartland Auto Repair', '5580 N 72nd St, Omaha', '4.6', '2.1 mi')" id="shop-2">
+              <div class="shop-name">Heartland Auto Repair</div>
+              <div class="shop-meta">
+                <span><span class="star">★</span> 4.6</span>
+                <span>📍 2.1 mi · 5580 N 72nd St</span>
+                <span>⏱ Est. 4–6 days</span>
+              </div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, 'Midlands Collision Center', '8800 L St, Omaha', '4.9', '3.4 mi')" id="shop-3">
+              <div class="shop-name">Midlands Collision Center</div>
+              <div class="shop-meta">
+                <span><span class="star">★</span> 4.9</span>
+                <span>📍 3.4 mi · 8800 L St</span>
+                <span>⏱ Est. 2–4 days</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="repairNext(1)" id="repair-next-1" disabled>
+            Select a Time →
+          </button>
+        </div>
+
+        <!-- Step 2: Choose time slot -->
+        <div id="repair-step-2" style="display:none;">
+          <p class="form-label" style="margin-bottom:4px;">Select Appointment Date & Time</p>
+          <p class="hint-text">All times are Central Time. Confirmation will be sent by SMS.</p>
+
+          <div class="time-slots" style="margin-top: 14px;" id="time-slots">
+            <div class="time-slot" onclick="selectSlot(this, 'Mon Mar 30', '8:00 AM')">
+              <span class="slot-date">Mon Mar 30</span>8:00 AM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Mon Mar 30', '10:00 AM')">
+              <span class="slot-date">Mon Mar 30</span>10:00 AM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Mon Mar 30', '1:00 PM')">
+              <span class="slot-date">Mon Mar 30</span>1:00 PM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Tue Mar 31', '8:00 AM')">
+              <span class="slot-date">Tue Mar 31</span>8:00 AM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Tue Mar 31', '11:00 AM')">
+              <span class="slot-date">Tue Mar 31</span>11:00 AM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Tue Mar 31', '2:00 PM')">
+              <span class="slot-date">Tue Mar 31</span>2:00 PM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Wed Apr 1', '9:00 AM')">
+              <span class="slot-date">Wed Apr 1</span>9:00 AM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Wed Apr 1', '12:00 PM')">
+              <span class="slot-date">Wed Apr 1</span>12:00 PM
+            </div>
+            <div class="time-slot" onclick="selectSlot(this, 'Wed Apr 1', '3:00 PM')">
+              <span class="slot-date">Wed Apr 1</span>3:00 PM
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 18px;">
+            <label class="form-label">Mobile Number for Confirmation SMS</label>
+            <input class="form-input" type="tel" id="repair-phone" placeholder="(402) 555-0000" oninput="checkRepairNext2()">
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
+            <button class="btn btn-primary" onclick="repairNext(2)" id="repair-next-2" disabled>
+              Review Booking →
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="repairBack(1)">← Back</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Review & confirm -->
+        <div id="repair-step-3" style="display:none;" id="repair-confirm">
+          <div class="success-state">
+            <div class="success-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div class="success-title">Review Your Booking</div>
+          </div>
+          <div class="summary-box" id="repair-summary"></div>
+
+          <div class="form-group" style="margin-top: 16px;">
+            <label class="form-label">Additional Notes (Optional)</label>
+            <textarea class="form-textarea" id="repair-notes" placeholder="e.g. Rental car needed, specific concerns..."></textarea>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+            <button class="btn btn-primary" onclick="submitRepair()" id="repair-submit-btn">
+              Confirm Appointment
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="repairBack(2)">← Back</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL: REQUEST CALLBACK
+  ═══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-callback">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <span class="modal-title">📞 Request Adjuster Callback</span>
+        <button class="modal-close" onclick="closeModal('callback')">×</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="step-indicator">
+          <div class="step-dot active" id="cb-step1"></div>
+          <div class="step-dot" id="cb-step2"></div>
+        </div>
+
+        <!-- Step 1: Preference -->
+        <div id="callback-step-1">
+          <p class="form-label" style="margin-bottom: 10px;">When would you like the callback?</p>
+
+          <div class="callback-options">
+            <div class="callback-option" onclick="selectCallbackTime(this, 'asap')">
+              <div class="callback-option-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="callback-option-label">As Soon As Possible</div>
+                <div class="callback-option-sub">Typically within 2 business hours</div>
+              </div>
+              <div class="radio-dot"></div>
+            </div>
+
+            <div class="callback-option" onclick="selectCallbackTime(this, 'morning')">
+              <div class="callback-option-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="callback-option-label">Morning</div>
+                <div class="callback-option-sub">8:00 AM – 12:00 PM CT</div>
+              </div>
+              <div class="radio-dot"></div>
+            </div>
+
+            <div class="callback-option" onclick="selectCallbackTime(this, 'afternoon')">
+              <div class="callback-option-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3"/>
+                </svg>
+              </div>
+              <div>
+                <div class="callback-option-label">Afternoon</div>
+                <div class="callback-option-sub">12:00 PM – 5:00 PM CT</div>
+              </div>
+              <div class="radio-dot"></div>
+            </div>
+
+            <div class="callback-option" onclick="selectCallbackTime(this, 'specific')">
+              <div class="callback-option-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="callback-option-label">Pick a Specific Date</div>
+                <div class="callback-option-sub">Schedule for a future date</div>
+              </div>
+              <div class="radio-dot"></div>
+            </div>
+          </div>
+
+          <!-- Date picker (shown when 'specific' selected) -->
+          <div id="specific-date-picker" style="display:none;">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Preferred Date</label>
+                <input class="form-input" type="date" id="callback-date" oninput="checkCallbackNext()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Preferred Time</label>
+                <select class="form-select" id="callback-specific-time" onchange="checkCallbackNext()">
+                  <option value="">Select time</option>
+                  <option>8:00 AM</option>
+                  <option>9:00 AM</option>
+                  <option>10:00 AM</option>
+                  <option>11:00 AM</option>
+                  <option>12:00 PM</option>
+                  <option>1:00 PM</option>
+                  <option>2:00 PM</option>
+                  <option>3:00 PM</option>
+                  <option>4:00 PM</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Best Phone Number</label>
+            <input class="form-input" type="tel" id="callback-phone" placeholder="(402) 555-0000" oninput="checkCallbackNext()">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">What's this about? (Optional)</label>
+            <select class="form-select" id="callback-topic">
+              <option value="">Select topic</option>
+              <option>Claim status update</option>
+              <option>Repair estimate question</option>
+              <option>Rental car coverage</option>
+              <option>Settlement amount</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" onclick="callbackNext()" id="callback-next-btn" disabled>
+            Review Request →
+          </button>
+        </div>
+
+        <!-- Step 2: Confirm -->
+        <div id="callback-step-2" style="display:none;">
+          <div class="success-state">
+            <div class="success-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            <div class="success-title">Review Callback Request</div>
+          </div>
+          <div class="summary-box" id="callback-summary"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="submitCallback()" id="callback-submit-btn">
+              Confirm Request
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="callbackBack()">← Back</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ─────────────────────────────────────────
+       SDK stub (Cognigy runtime will replace)
+    ───────────────────────────────────────── */
+    if (typeof SDK === "undefined") {
+      window.SDK = {
+        submit: (payload) => {
+          console.log("📤 SDK.submit →", JSON.stringify(payload, null, 2));
+          alert("Cognigy SDK.submit:\n\n" + JSON.stringify(payload, null, 2));
+        }
+      };
+    }
+
+    /* ─────────────────────────────────────────
+       Modal open/close
+    ───────────────────────────────────────── */
+    function openModal(id) {
+      document.getElementById('modal-' + id).classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+      document.getElementById('modal-' + id).classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Close on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+      el.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       PHOTOS FLOW
+    ───────────────────────────────────────── */
+    let selectedFiles = [];
+    let selectedCategories = [];
+
+    function toggleCategory(el) {
+      el.classList.toggle('active');
+      selectedCategories = Array.from(document.querySelectorAll('.category-chip.active')).map(c => c.textContent);
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.add('dragover');
+    }
+
+    function handleDragLeave(e) {
+      document.getElementById('upload-zone').classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.remove('dragover');
+      processFiles(Array.from(e.dataTransfer.files));
+    }
+
+    function handleFileSelect(e) {
+      processFiles(Array.from(e.target.files));
+    }
+
+    function processFiles(files) {
+      const imageFiles = files.filter(f => f.type.startsWith('image/'));
+      selectedFiles = [...selectedFiles, ...imageFiles].slice(0, 12); // max 12
+      renderPhotoGrid();
+      document.getElementById('photos-next-btn').disabled = selectedFiles.length === 0;
+    }
+
+    function renderPhotoGrid() {
+      const grid = document.getElementById('photo-grid');
+      const countEl = document.getElementById('photo-count-display');
+      grid.innerHTML = '';
+
+      selectedFiles.forEach((file, i) => {
+        const url = URL.createObjectURL(file);
+        const thumb = document.createElement('div');
+        thumb.className = 'photo-thumb';
+        thumb.innerHTML = `
+          <img src="${url}" alt="Photo ${i+1}">
+          <button class="remove-btn" onclick="removePhoto(${i})">×</button>
+        `;
+        grid.appendChild(thumb);
+      });
+
+      if (selectedFiles.length > 0) {
+        countEl.innerHTML = `<div class="photo-count-badge" style="margin-top:12px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          ${selectedFiles.length} photo${selectedFiles.length > 1 ? 's' : ''} selected
+        </div>`;
+      } else {
+        countEl.innerHTML = '';
+      }
+    }
+
+    function removePhoto(i) {
+      selectedFiles.splice(i, 1);
+      renderPhotoGrid();
+      document.getElementById('photos-next-btn').disabled = selectedFiles.length === 0;
+    }
+
+    function photosNext() {
+      // Show step 2
+      document.getElementById('photos-step-1').style.display = 'none';
+      document.getElementById('photos-step-2').style.display = 'block';
+      document.getElementById('photos-step1').classList.remove('active');
+      document.getElementById('photos-step1').classList.add('done');
+      document.getElementById('photos-step2').classList.add('active');
+
+      // Build summary
+      const cats = selectedCategories.length > 0 ? selectedCategories.join(', ') : 'Not specified';
+      document.getElementById('photos-summary').innerHTML = `
+        <div class="summary-row"><span class="summary-label">Photos selected</span><span class="summary-value">${selectedFiles.length}</span></div>
+        <div class="summary-row"><span class="summary-label">Categories</span><span class="summary-value">${cats}</span></div>
+        <div class="summary-row"><span class="summary-label">Claim #</span><span class="summary-value">FMR-2026-004219</span></div>
+      `;
+    }
+
+    function photosBack() {
+      document.getElementById('photos-step-1').style.display = 'block';
+      document.getElementById('photos-step-2').style.display = 'none';
+      document.getElementById('photos-step2').classList.remove('active');
+      document.getElementById('photos-step1').classList.remove('done');
+      document.getElementById('photos-step1').classList.add('active');
+    }
+
+    function submitPhotos() {
+      const btn = document.getElementById('photos-submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Uploading…';
+
+      const payload = {
+        action: 'add-photos',
+        claimNumber: 'FMR-2026-004219',
+        photoCount: selectedFiles.length,
+        photoCategories: selectedCategories.length > 0 ? selectedCategories : ['General'],
+        fileNames: selectedFiles.map(f => f.name),
+        submittedAt: new Date().toISOString()
+      };
+
+      setTimeout(() => {
+        // Update doc badge on main card
+        const badge = document.getElementById('doc-photos');
+        badge.className = 'badge badge-ok';
+        badge.innerHTML = `<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Uploaded`;
+
+        SDK.submit(payload);
+        closeModal('photos');
+        btn.disabled = false;
+        btn.innerHTML = 'Submit Photos';
+      }, 1400);
+    }
+
+    /* ─────────────────────────────────────────
+       REPAIR SHOP FLOW
+    ───────────────────────────────────────── */
+    let selectedShop = null;
+    let selectedSlot = null;
+
+    function selectShop(el, name, address, rating, distance) {
+      document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedShop = { name, address, rating, distance };
+      document.getElementById('repair-next-1').disabled = false;
+    }
+
+    function selectSlot(el, date, time) {
+      document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedSlot = { date, time };
+      checkRepairNext2();
+    }
+
+    function checkRepairNext2() {
+      const phone = document.getElementById('repair-phone').value.trim();
+      document.getElementById('repair-next-2').disabled = !(selectedSlot && phone.length >= 7);
+    }
+
+    function repairNext(step) {
+      if (step === 1) {
+        document.getElementById('repair-step-1').style.display = 'none';
+        document.getElementById('repair-step-2').style.display = 'block';
+        document.getElementById('repair-step1').classList.remove('active');
+        document.getElementById('repair-step1').classList.add('done');
+        document.getElementById('repair-step2').classList.add('active');
+      } else if (step === 2) {
+        document.getElementById('repair-step-2').style.display = 'none';
+        document.getElementById('repair-step-3').style.display = 'block';
+        document.getElementById('repair-step2').classList.remove('active');
+        document.getElementById('repair-step2').classList.add('done');
+        document.getElementById('repair-step3').classList.add('active');
+
+        // Build summary
+        const phone = document.getElementById('repair-phone').value;
+        document.getElementById('repair-summary').innerHTML = `
+          <div class="summary-row"><span class="summary-label">Shop</span><span class="summary-value">${selectedShop.name}</span></div>
+          <div class="summary-row"><span class="summary-label">Address</span><span class="summary-value">${selectedShop.address}</span></div>
+          <div class="summary-row"><span class="summary-label">Date</span><span class="summary-value">${selectedSlot.date}</span></div>
+          <div class="summary-row"><span class="summary-label">Time</span><span class="summary-value">${selectedSlot.time} CT</span></div>
+          <div class="summary-row"><span class="summary-label">SMS Confirmation</span><span class="summary-value">${phone}</span></div>
+          <div class="summary-row"><span class="summary-label">Claim #</span><span class="summary-value">FMR-2026-004219</span></div>
+        `;
+      }
+    }
+
+    function repairBack(step) {
+      if (step === 1) {
+        document.getElementById('repair-step-2').style.display = 'none';
+        document.getElementById('repair-step-1').style.display = 'block';
+        document.getElementById('repair-step2').classList.remove('active');
+        document.getElementById('repair-step1').classList.remove('done');
+        document.getElementById('repair-step1').classList.add('active');
+      } else if (step === 2) {
+        document.getElementById('repair-step-3').style.display = 'none';
+        document.getElementById('repair-step-2').style.display = 'block';
+        document.getElementById('repair-step3').classList.remove('active');
+        document.getElementById('repair-step2').classList.remove('done');
+        document.getElementById('repair-step2').classList.add('active');
+      }
+    }
+
+    function submitRepair() {
+      const btn = document.getElementById('repair-submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Scheduling…';
+
+      const notes = document.getElementById('repair-notes').value.trim();
+      const phone = document.getElementById('repair-phone').value.trim();
+
+      const payload = {
+        action: 'schedule-repair-estimate',
+        claimNumber: 'FMR-2026-004219',
+        repairShop: {
+          name: selectedShop.name,
+          address: selectedShop.address,
+          rating: selectedShop.rating,
+          distance: selectedShop.distance
+        },
+        appointment: {
+          date: selectedSlot.date,
+          time: selectedSlot.time,
+          timezone: 'CT'
+        },
+        confirmationPhone: phone,
+        additionalNotes: notes || null,
+        submittedAt: new Date().toISOString()
+      };
+
+      setTimeout(() => {
+        // Update estimate badge on main card
+        const badge = document.getElementById('doc-estimate');
+        badge.className = 'badge badge-pending';
+        badge.innerHTML = `<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg> Scheduled`;
+
+        SDK.submit(payload);
+        closeModal('repair');
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm Appointment';
+      }, 1400);
+    }
+
+    /* ─────────────────────────────────────────
+       CALLBACK FLOW
+    ───────────────────────────────────────── */
+    let selectedCallbackTime = null;
+
+    function selectCallbackTime(el, value) {
+      document.querySelectorAll('.callback-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedCallbackTime = value;
+
+      // Show/hide date picker
+      document.getElementById('specific-date-picker').style.display = (value === 'specific') ? 'block' : 'none';
+      checkCallbackNext();
+    }
+
+    function checkCallbackNext() {
+      const phone = document.getElementById('callback-phone').value.trim();
+      let valid = selectedCallbackTime && phone.length >= 7;
+
+      if (selectedCallbackTime === 'specific') {
+        const date = document.getElementById('callback-date').value;
+        const time = document.getElementById('callback-specific-time').value;
+        valid = valid && date && time;
+      }
+
+      document.getElementById('callback-next-btn').disabled = !valid;
+    }
+
+    function callbackNext() {
+      document.getElementById('callback-step-1').style.display = 'none';
+      document.getElementById('callback-step-2').style.display = 'block';
+      document.getElementById('cb-step1').classList.remove('active');
+      document.getElementById('cb-step1').classList.add('done');
+      document.getElementById('cb-step2').classList.add('active');
+
+      const phone = document.getElementById('callback-phone').value;
+      const topic = document.getElementById('callback-topic').value || 'Not specified';
+      let timeLabel = {
+        asap: 'As Soon As Possible',
+        morning: 'Morning (8 AM – 12 PM CT)',
+        afternoon: 'Afternoon (12 PM – 5 PM CT)',
+        specific: 'Scheduled'
+      }[selectedCallbackTime];
+
+      let dateRow = '';
+      if (selectedCallbackTime === 'specific') {
+        const d = document.getElementById('callback-date').value;
+        const t = document.getElementById('callback-specific-time').value;
+        dateRow = `<div class="summary-row"><span class="summary-label">Date & Time</span><span class="summary-value">${d} at ${t}</span></div>`;
+      }
+
+      document.getElementById('callback-summary').innerHTML = `
+        <div class="summary-row"><span class="summary-label">Adjuster</span><span class="summary-value">Sarah Lee</span></div>
+        <div class="summary-row"><span class="summary-label">Callback Time</span><span class="summary-value">${timeLabel}</span></div>
+        ${dateRow}
+        <div class="summary-row"><span class="summary-label">Phone</span><span class="summary-value">${phone}</span></div>
+        <div class="summary-row"><span class="summary-label">Topic</span><span class="summary-value">${topic}</span></div>
+        <div class="summary-row"><span class="summary-label">Claim #</span><span class="summary-value">FMR-2026-004219</span></div>
+      `;
+    }
+
+    function callbackBack() {
+      document.getElementById('callback-step-2').style.display = 'none';
+      document.getElementById('callback-step-1').style.display = 'block';
+      document.getElementById('cb-step2').classList.remove('active');
+      document.getElementById('cb-step1').classList.remove('done');
+      document.getElementById('cb-step1').classList.add('active');
+    }
+
+    function submitCallback() {
+      const btn = document.getElementById('callback-submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Submitting…';
+
+      const phone = document.getElementById('callback-phone').value.trim();
+      const topic = document.getElementById('callback-topic').value;
+
+      let preferredTime = selectedCallbackTime;
+      let scheduledDate = null;
+      let scheduledTime = null;
+
+      if (selectedCallbackTime === 'specific') {
+        scheduledDate = document.getElementById('callback-date').value;
+        scheduledTime = document.getElementById('callback-specific-time').value;
+      }
+
+      const payload = {
+        action: 'request-adjuster-callback',
+        claimNumber: 'FMR-2026-004219',
+        adjuster: 'Sarah Lee',
+        callback: {
+          preferredTime,
+          scheduledDate: scheduledDate || null,
+          scheduledTime: scheduledTime || null
+        },
+        contactPhone: phone,
+        topic: topic || null,
+        submittedAt: new Date().toISOString()
+      };
+
+      setTimeout(() => {
+        SDK.submit(payload);
+        closeModal('callback');
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm Request';
+      }, 1400);
+    }
+  </script>
+</body>
+</html>
