@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chubb | File a New Claim</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --chubb-black:    #000000;
+      --chubb-navy:     #0A1628;
+      --chubb-navy-md:  #152241;
+      --chubb-gold:     #B8972C;
+      --chubb-gold-lt:  #D4AF4A;
+      --chubb-cream:    #F5F2EC;
+      --chubb-white:    #FAFAF8;
+      --border:         #D9D5CC;
+      --border-dk:      #C4BFB5;
+      --text-dark:      #0A1628;
+      --text-mid:       #3D4A5C;
+      --text-light:     #7A8499;
+      --green-bg:       #EAF4EE;
+      --green-txt:      #1A5C35;
+      --red-bg:         #FEF0F0;
+      --red-txt:        #991B1B;
+      --gray-bg:        #F0EDE8;
+    }
+
+    body {
+      font-family: 'DM Sans', 'Segoe UI', sans-serif;
+      background: linear-gradient(160deg, #0D1C35 0%, #1B2D4A 40%, #0E2040 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px 48px;
+    }
+
+    .card {
+      background: var(--chubb-white);
+      border-radius: 4px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 4px 16px rgba(0,0,0,0.25);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      animation: slideUp 0.5s ease both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HEADER ── */
+    .card-header {
+      background: #000;
+      padding: 26px 28px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--chubb-gold) 0%, var(--chubb-gold-lt) 50%, var(--chubb-gold) 100%);
+    }
+
+    .logo-wrap img {
+      height: 32px;
+      width: auto;
+      display: block;
+      filter: invert(1);
+    }
+
+    .header-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(184,151,44,0.5);
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      background: var(--chubb-cream);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .prog-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+      position: relative;
+    }
+
+    .prog-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 13px;
+      left: 50%;
+      width: 100%;
+      height: 1.5px;
+      background: var(--border-dk);
+      z-index: 0;
+      transition: background 0.3s;
+    }
+
+    .prog-step.completed:not(:last-child)::after {
+      background: var(--chubb-gold);
+    }
+
+    .prog-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--border-dk);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-light);
+      position: relative;
+      z-index: 1;
+      transition: all 0.25s;
+    }
+
+    .prog-step.active .prog-dot {
+      border-color: var(--chubb-navy);
+      background: var(--chubb-navy);
+      color: #fff;
+    }
+
+    .prog-step.completed .prog-dot {
+      border-color: var(--chubb-gold);
+      background: var(--chubb-gold);
+      color: var(--chubb-navy);
+    }
+
+    .prog-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-align: center;
+      white-space: nowrap;
+      transition: color 0.25s;
+    }
+
+    .prog-step.active .prog-label { color: var(--chubb-navy); }
+    .prog-step.completed .prog-label { color: var(--chubb-gold); }
+
+    /* ── BODY ── */
+    .card-body { padding: 24px 28px; }
+
+    .step-panel { display: none; animation: fadeIn 0.3s ease both; }
+    .step-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-heading {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--chubb-navy);
+      margin-bottom: 4px;
+    }
+
+    .step-sub {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-bottom: 22px;
+      line-height: 1.55;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 6px;
+    }
+
+    .form-label .req { color: var(--chubb-gold); }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      border: 1px solid var(--border-dk);
+      border-radius: 2px;
+      padding: 10px 13px;
+      font-family: 'DM Sans', inherit;
+      font-size: 14px;
+      color: var(--text-dark);
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      appearance: none;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--chubb-navy);
+      box-shadow: 0 0 0 3px rgba(10,22,40,0.08);
+    }
+
+    .form-input.error, .form-select.error, .form-textarea.error {
+      border-color: #DC2626;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+    }
+
+    .form-textarea { resize: vertical; min-height: 90px; }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+
+    .form-hint {
+      font-size: 11.5px;
+      color: var(--text-light);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .field-error {
+      font-size: 11.5px;
+      color: #DC2626;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* ── CLAIM TYPE CARDS ── */
+    .claim-types {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .claim-type-card {
+      border: 1.5px solid var(--border-dk);
+      border-radius: 3px;
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+
+    .claim-type-card:hover { border-color: var(--chubb-navy); }
+
+    .claim-type-card.selected {
+      border-color: var(--chubb-gold);
+      background: #FDFAF3;
+    }
+
+    .claim-type-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 7px; right: 9px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--chubb-gold);
+    }
+
+    .claim-type-icon {
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .claim-type-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.3;
+    }
+
+    .claim-type-sub {
+      font-size: 11px;
+      color: var(--text-light);
+      line-height: 1.4;
+    }
+
+    /* ── SECTION DIVIDER ── */
+    .section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--chubb-navy);
+      margin-top: 24px;
+      margin-bottom: 14px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--chubb-gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .section-title:first-child { margin-top: 0; }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone {
+      border: 1.5px dashed var(--border-dk);
+      border-radius: 3px;
+      padding: 26px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      background: #fff;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--chubb-gold);
+      background: #FDFAF3;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--gray-bg);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .upload-icon svg { width: 20px; height: 20px; color: var(--text-mid); }
+    .upload-title { font-size: 13.5px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
+    .upload-sub { font-size: 12px; color: var(--text-light); }
+
+    .file-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gray-bg);
+      border-radius: 2px;
+      padding: 8px 10px;
+      font-size: 12.5px;
+    }
+
+    .file-item-icon { font-size: 16px; flex-shrink: 0; }
+    .file-item-name { flex: 1; color: var(--text-dark); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-item-size { color: var(--text-light); font-size: 11px; flex-shrink: 0; }
+    .file-item-remove {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 15px;
+      padding: 0;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .file-item-remove:hover { color: #DC2626; }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 2px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .photo-thumb .remove-btn {
+      position: absolute;
+      top: 3px; right: 3px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 18px; height: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    /* ── ACTIONS ── */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 2px;
+      padding: 13px 18px;
+      font-family: 'DM Sans', inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: transform 0.12s, box-shadow 0.12s, background 0.15s, opacity 0.15s;
+    }
+
+    .btn:hover  { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(0,0,0,0.15); }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+
+    .btn-primary {
+      background: var(--chubb-navy);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(10,22,40,0.25);
+    }
+
+    .btn-primary:hover { background: var(--chubb-navy-md); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--chubb-navy);
+      border: 1.5px solid var(--border-dk);
+      flex: 0 0 auto;
+      padding: 13px 20px;
+    }
+
+    .btn-ghost:hover { border-color: var(--chubb-navy); }
+
+    .btn-gold {
+      background: var(--chubb-gold);
+      color: var(--chubb-navy);
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(184,151,44,0.30);
+    }
+
+    .btn-gold:hover { background: var(--chubb-gold-lt); }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* ── REVIEW SUMMARY ── */
+    .review-section { margin-bottom: 20px; }
+
+    .review-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13px;
+      padding: 5px 0;
+      gap: 12px;
+    }
+
+    .review-label { color: var(--text-light); flex-shrink: 0; }
+    .review-value { color: var(--text-dark); font-weight: 600; text-align: right; }
+
+    /* ── SUCCESS STATE ── */
+    .success-wrap {
+      text-align: center;
+      padding: 16px 0 8px;
+    }
+
+    .success-icon-wrap {
+      width: 66px;
+      height: 66px;
+      background: var(--green-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      border: 1px solid #A8D5B5;
+    }
+
+    .success-icon-wrap svg { width: 32px; height: 32px; color: var(--green-txt); }
+
+    .success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .success-sub {
+      font-size: 13.5px;
+      color: var(--text-mid);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .claim-number-box {
+      background: var(--chubb-cream);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .claim-number-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .claim-number-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--chubb-navy);
+      letter-spacing: 0.06em;
+    }
+
+    .next-steps-list {
+      list-style: none;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .next-steps-list li {
+      font-size: 13px;
+      color: var(--text-mid);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.55;
+    }
+
+    .next-steps-list li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 7px;
+      width: 5px; height: 5px;
+      background: var(--chubb-gold);
+      border-radius: 50%;
+    }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    .card-footer {
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: center;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--chubb-cream);
+      line-height: 1.6;
+    }
+
+    /* ── DYNAMIC SECTIONS ── */
+    .dynamic-section { display: none; }
+    .dynamic-section.visible { display: block; }
+
+    /* ── CHECKBOX / RADIO GROUPS ── */
+    .check-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: var(--text-mid);
+    }
+
+    .check-row input[type="checkbox"], .check-row input[type="radio"] {
+      accent-color: var(--chubb-navy);
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    /* ── INJURY TOGGLE ── */
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      border: 1.5px solid var(--border-dk);
+      border-radius: 2px;
+      padding: 9px;
+      background: #fff;
+      font-family: 'DM Sans', inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .toggle-btn.active {
+      border-color: var(--chubb-navy);
+      background: var(--chubb-navy);
+      color: #fff;
+    }
+
+    /* Icon */
+    .icon { width: 14px; height: 14px; vertical-align: middle; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="logo-wrap">
+      <img src="data:image/jpeg;base64,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" alt="Chubb">
+    </div>
+    <div class="header-divider"></div>
+    <div class="page-title">File a New Claim</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-steps">
+      <div class="prog-step active" id="prog-1">
+        <div class="prog-dot">1</div>
+        <div class="prog-label">Claim Type</div>
+      </div>
+      <div class="prog-step" id="prog-2">
+        <div class="prog-dot">2</div>
+        <div class="prog-label">Policy</div>
+      </div>
+      <div class="prog-step" id="prog-3">
+        <div class="prog-dot">3</div>
+        <div class="prog-label">Incident</div>
+      </div>
+      <div class="prog-step" id="prog-4">
+        <div class="prog-dot">4</div>
+        <div class="prog-label">Documents</div>
+      </div>
+      <div class="prog-step" id="prog-5">
+        <div class="prog-dot">5</div>
+        <div class="prog-label">Review</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body">
+
+    <!-- ── STEP 1: Claim Type ── -->
+    <div class="step-panel active" id="step-1">
+      <div class="step-heading">Select Claim Type</div>
+      <div class="step-sub">Choose the category that best describes your loss or damage.</div>
+
+      <div class="claim-types">
+        <div class="claim-type-card" onclick="selectClaimType(this, 'Auto')" data-type="Auto">
+          <div class="claim-type-icon">🚗</div>
+          <div class="claim-type-label">Auto</div>
+          <div class="claim-type-sub">Collision, theft, glass, roadside</div>
+        </div>
+        <div class="claim-type-card" onclick="selectClaimType(this, 'Home & Property')" data-type="Home">
+          <div class="claim-type-icon">🏠</div>
+          <div class="claim-type-label">Home & Property</div>
+          <div class="claim-type-sub">Fire, water, storm, theft</div>
+        </div>
+        <div class="claim-type-card" onclick="selectClaimType(this, 'Business')" data-type="Business">
+          <div class="claim-type-icon">🏢</div>
+          <div class="claim-type-label">Business</div>
+          <div class="claim-type-sub">Commercial property & liability</div>
+        </div>
+        <div class="claim-type-card" onclick="selectClaimType(this, 'Travel')" data-type="Travel">
+          <div class="claim-type-icon">✈️</div>
+          <div class="claim-type-label">Travel</div>
+          <div class="claim-type-sub">Trip cancel, delay, medical</div>
+        </div>
+        <div class="claim-type-card" onclick="selectClaimType(this, 'Liability')" data-type="Liability">
+          <div class="claim-type-icon">⚖️</div>
+          <div class="claim-type-label">Liability</div>
+          <div class="claim-type-sub">Personal or umbrella liability</div>
+        </div>
+        <div class="claim-type-card" onclick="selectClaimType(this, 'Specialty')" data-type="Specialty">
+          <div class="claim-type-icon">💎</div>
+          <div class="claim-type-label">Specialty</div>
+          <div class="claim-type-sub">Valuables, marine, cyber</div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top: 24px;">
+        <button class="btn btn-primary" onclick="goTo(2)" id="step1-next" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Policy & Contact ── -->
+    <div class="step-panel" id="step-2">
+      <div class="step-heading">Policy & Contact</div>
+      <div class="step-sub">Enter your policy details and how we can reach you.</div>
+
+      <div class="section-title">Policy Information</div>
+
+      <div class="form-group">
+        <label class="form-label">Policy Number <span class="req">*</span></label>
+        <input class="form-input" type="text" id="policy-number" placeholder="e.g. 35-BA-12345678" oninput="validate()">
+        <div class="field-error" id="err-policy">Please enter your policy number.</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name <span class="req">*</span></label>
+          <input class="form-input" type="text" id="first-name" placeholder="Jane" oninput="validate()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name <span class="req">*</span></label>
+          <input class="form-input" type="text" id="last-name" placeholder="Smith" oninput="validate()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address <span class="req">*</span></label>
+        <input class="form-input" type="email" id="email" placeholder="jane.smith@email.com" oninput="validate()">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number <span class="req">*</span></label>
+        <input class="form-input" type="tel" id="phone" placeholder="(555) 000-0000" oninput="validate()">
+      </div>
+
+      <div class="section-title">Preferred Contact Method</div>
+      <div class="check-group" style="flex-direction: row; flex-wrap: wrap; gap: 14px;">
+        <label class="check-row">
+          <input type="radio" name="contact-pref" value="Phone" checked> Phone
+        </label>
+        <label class="check-row">
+          <input type="radio" name="contact-pref" value="Email"> Email
+        </label>
+        <label class="check-row">
+          <input type="radio" name="contact-pref" value="Either"> Either
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(3)" id="step2-next" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Incident Details ── -->
+    <div class="step-panel" id="step-3">
+      <div class="step-heading">Incident Details</div>
+      <div class="step-sub">Tell us what happened. The more detail, the faster we can process your claim.</div>
+
+      <div class="section-title">When & Where</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date of Loss <span class="req">*</span></label>
+          <input class="form-input" type="date" id="loss-date" oninput="validate()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Approx. Time</label>
+          <input class="form-input" type="time" id="loss-time">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Location of Incident <span class="req">*</span></label>
+        <input class="form-input" type="text" id="loss-location" placeholder="City, State or full address" oninput="validate()">
+      </div>
+
+      <!-- AUTO-specific fields -->
+      <div id="auto-fields" class="dynamic-section">
+        <div class="section-title">Vehicle Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Year</label>
+            <input class="form-input" type="text" id="veh-year" placeholder="2024">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Make</label>
+            <input class="form-input" type="text" id="veh-make" placeholder="Toyota">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Model</label>
+            <input class="form-input" type="text" id="veh-model" placeholder="Camry">
+          </div>
+          <div class="form-group">
+            <label class="form-label">License Plate</label>
+            <input class="form-input" type="text" id="veh-plate" placeholder="ABC-1234">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type of Auto Loss <span class="req">*</span></label>
+          <select class="form-select" id="auto-loss-type">
+            <option value="">Select loss type</option>
+            <option>Collision</option>
+            <option>Comprehensive (Non-Collision)</option>
+            <option>Theft / Stolen Vehicle</option>
+            <option>Glass / Windshield</option>
+            <option>Flood Damage</option>
+            <option>Fire Damage</option>
+            <option>Hit & Run</option>
+            <option>Roadside / Towing</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Was another vehicle involved?</label>
+          <div class="toggle-group">
+            <button class="toggle-btn" onclick="toggleBtn(this, 'other-vehicle-group', true)" data-group="other-veh">Yes</button>
+            <button class="toggle-btn active" onclick="toggleBtn(this, 'other-vehicle-group', false)" data-group="other-veh">No</button>
+          </div>
+        </div>
+        <div id="other-vehicle-group" class="dynamic-section">
+          <div class="form-group">
+            <label class="form-label">Other Driver Name</label>
+            <input class="form-input" type="text" id="other-driver" placeholder="Full name">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Other Driver Phone</label>
+              <input class="form-input" type="tel" id="other-phone" placeholder="(555) 000-0000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Other Insurance</label>
+              <input class="form-input" type="text" id="other-insurance" placeholder="Carrier name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOME-specific fields -->
+      <div id="home-fields" class="dynamic-section">
+        <div class="section-title">Property Information</div>
+        <div class="form-group">
+          <label class="form-label">Type of Loss <span class="req">*</span></label>
+          <select class="form-select" id="home-loss-type">
+            <option value="">Select loss type</option>
+            <option>Fire or Smoke</option>
+            <option>Water / Flooding</option>
+            <option>Storm / Wind / Hail</option>
+            <option>Theft / Burglary</option>
+            <option>Vandalism</option>
+            <option>Earthquake</option>
+            <option>Liability / Injury on Property</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Property Address</label>
+          <input class="form-input" type="text" id="property-address" placeholder="Street address">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Is the property safe to occupy?</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" onclick="toggleBtn(this, null, null)" data-group="occupancy">Yes</button>
+            <button class="toggle-btn" onclick="toggleBtn(this, null, null)" data-group="occupancy">No</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAVEL-specific fields -->
+      <div id="travel-fields" class="dynamic-section">
+        <div class="section-title">Trip Information</div>
+        <div class="form-group">
+          <label class="form-label">Type of Travel Claim <span class="req">*</span></label>
+          <select class="form-select" id="travel-loss-type">
+            <option value="">Select claim type</option>
+            <option>Trip Cancellation</option>
+            <option>Trip Delay / Interruption</option>
+            <option>Baggage Loss or Delay</option>
+            <option>Medical Emergency Abroad</option>
+            <option>Emergency Evacuation</option>
+            <option>Missed Connection</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Departure Date</label>
+            <input class="form-input" type="date" id="depart-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Return Date</label>
+            <input class="form-input" type="date" id="return-date">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destination</label>
+          <input class="form-input" type="text" id="destination" placeholder="City, Country">
+        </div>
+      </div>
+
+      <!-- BUSINESS-specific fields -->
+      <div id="business-fields" class="dynamic-section">
+        <div class="section-title">Business Information</div>
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input class="form-input" type="text" id="biz-name" placeholder="Acme Corp.">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type of Business Claim <span class="req">*</span></label>
+          <select class="form-select" id="biz-loss-type">
+            <option value="">Select claim type</option>
+            <option>Commercial Property Damage</option>
+            <option>General Liability</option>
+            <option>Business Interruption</option>
+            <option>Cyber Incident</option>
+            <option>Workers Compensation</option>
+            <option>Directors & Officers</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- SPECIALTY / LIABILITY common field -->
+      <div id="specialty-fields" class="dynamic-section">
+        <div class="section-title">Item / Coverage Information</div>
+        <div class="form-group">
+          <label class="form-label">Type of Specialty Claim</label>
+          <select class="form-select" id="specialty-loss-type">
+            <option value="">Select claim type</option>
+            <option>Fine Art / Collectibles</option>
+            <option>Jewelry / Valuables</option>
+            <option>Watercraft / Marine</option>
+            <option>Cyber / Identity Theft</option>
+            <option>Other Specialty</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estimated Value of Loss</label>
+          <input class="form-input" type="text" id="specialty-value" placeholder="e.g. $5,000">
+        </div>
+      </div>
+
+      <!-- ALL: Injuries & Description -->
+      <div class="section-title">Injuries & Description</div>
+
+      <div class="form-group">
+        <label class="form-label">Were there any injuries?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" onclick="toggleBtn(this, 'injury-group', true)" data-group="injury">Yes</button>
+          <button class="toggle-btn active" onclick="toggleBtn(this, 'injury-group', false)" data-group="injury">No</button>
+        </div>
+      </div>
+
+      <div id="injury-group" class="dynamic-section">
+        <div class="form-group">
+          <label class="form-label">Describe Injuries</label>
+          <textarea class="form-textarea" id="injury-desc" placeholder="Describe injuries and number of people affected…" style="min-height:70px;"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Was a police / fire report filed?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" onclick="toggleBtn(this, 'report-group', true)" data-group="report">Yes</button>
+          <button class="toggle-btn active" onclick="toggleBtn(this, 'report-group', false)" data-group="report">No</button>
+        </div>
+      </div>
+
+      <div id="report-group" class="dynamic-section">
+        <div class="form-group">
+          <label class="form-label">Report Number</label>
+          <input class="form-input" type="text" id="report-number" placeholder="Report or case number">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reporting Agency</label>
+          <input class="form-input" type="text" id="report-agency" placeholder="e.g. Omaha Police Dept.">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description of Loss <span class="req">*</span></label>
+        <textarea class="form-textarea" id="loss-desc" placeholder="Describe in detail what happened, the damage caused, and any other relevant information…" oninput="validate()"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(4)" id="step3-next" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: Documents & Photos ── -->
+    <div class="step-panel" id="step-4">
+      <div class="step-heading">Documents & Photos</div>
+      <div class="step-sub">Upload supporting evidence. All files are encrypted and stored securely.</div>
+
+      <div class="section-title">Photos of Damage</div>
+
+      <div class="upload-zone" id="photo-zone" ondragover="handleDragOver('photo-zone', event)" ondragleave="handleDragLeave('photo-zone', event)" ondrop="handleDrop('photo-zone', event)">
+        <input type="file" accept="image/*" multiple onchange="handlePhotoSelect(event)">
+        <div class="upload-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4-4 4 4 4-6 4 6M3 20h18M9 8a2 2 0 110-4 2 2 0 010 4z"/>
+          </svg>
+        </div>
+        <div class="upload-title">Tap to upload photos</div>
+        <div class="upload-sub">JPG, PNG, HEIC · up to 10 MB each</div>
+      </div>
+      <div class="photo-grid" id="photo-grid"></div>
+
+      <div class="section-title" style="margin-top: 22px;">Supporting Documents</div>
+      <div class="form-hint" style="margin-bottom:10px;">Police reports, repair estimates, receipts, medical records, etc.</div>
+
+      <div class="upload-zone" id="doc-zone" ondragover="handleDragOver('doc-zone', event)" ondragleave="handleDragLeave('doc-zone', event)" ondrop="handleDocDrop('doc-zone', event)">
+        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,image/*" multiple onchange="handleDocSelect(event)">
+        <div class="upload-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div class="upload-title">Tap to upload documents</div>
+        <div class="upload-sub">PDF, DOC, XLS · up to 20 MB each</div>
+      </div>
+      <div class="file-list" id="doc-list"></div>
+
+      <p class="form-hint" style="margin-top:14px;">You can also submit documents later through your claims portal. Uploading now speeds up processing.</p>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+        <button class="btn btn-primary" onclick="buildReview(); goTo(5)">Review Claim →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 5: Review & Submit ── -->
+    <div class="step-panel" id="step-5">
+      <div class="step-heading">Review Your Claim</div>
+      <div class="step-sub">Please verify all details before submitting.</div>
+
+      <div id="review-content"></div>
+
+      <div class="form-group" style="margin-top: 20px;">
+        <label class="check-row" style="align-items: flex-start; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="certify-check" onchange="validate()" style="margin-top: 3px;">
+          <span style="font-size: 12.5px; color: var(--text-mid); line-height: 1.55;">I certify that the information provided is accurate and complete to the best of my knowledge. I understand that providing false information may result in denial of my claim.</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="goTo(4)">← Back</button>
+        <button class="btn btn-gold" onclick="submitClaim()" id="submit-btn" disabled>Submit Claim</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 6: Success ── -->
+    <div class="step-panel" id="step-6">
+      <div class="success-wrap">
+        <div class="success-icon-wrap">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <div class="success-title">Claim Submitted</div>
+        <div class="success-sub">Your claim has been received and assigned to a Chubb adjuster. You'll receive a confirmation by email and SMS shortly.</div>
+
+        <div class="claim-number-box">
+          <div class="claim-number-label">Your Claim Number</div>
+          <div class="claim-number-value" id="generated-claim-number">CHB-2026-——</div>
+        </div>
+
+        <div class="section-title" style="text-align: left;">What Happens Next</div>
+        <ul class="next-steps-list">
+          <li>An adjuster will contact you within 1 business day to confirm receipt and discuss next steps.</li>
+          <li>You'll receive login credentials for your Chubb Claims Portal to track progress in real time.</li>
+          <li>If applicable, submit any outstanding documents through the portal or by replying to your confirmation email.</li>
+          <li>A repair or damage assessment will be scheduled based on your claim type.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /.card-body -->
+
+  <div class="card-footer">
+    Chubb is the marketing name used to refer to subsidiaries of Chubb Limited. By submitting, you agree that Chubb may contact you regarding your claim. All data is encrypted in transit and at rest.
+  </div>
+</div><!-- /.card -->
+
+<script>
+  /* ── STATE ── */
+  let currentStep = 1;
+  let claimType = '';
+  let photoFiles = [];
+  let docFiles = [];
+
+  /* ── NAVIGATION ── */
+  function goTo(step) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    document.getElementById('step-' + step).classList.add('active');
+
+    // Update progress dots
+    for (let i = 1; i <= 5; i++) {
+      const prog = document.getElementById('prog-' + i);
+      if (!prog) continue;
+      prog.classList.remove('active', 'completed');
+      if (i < step) prog.classList.add('completed');
+      else if (i === step) prog.classList.add('active');
+    }
+
+    currentStep = step;
+    validate();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── CLAIM TYPE SELECTION ── */
+  function selectClaimType(el, type) {
+    document.querySelectorAll('.claim-type-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    claimType = type;
+    document.getElementById('step1-next').disabled = false;
+
+    // Show/hide dynamic fields in step 3
+    ['auto-fields', 'home-fields', 'travel-fields', 'business-fields', 'specialty-fields'].forEach(id => {
+      document.getElementById(id).classList.remove('visible');
+    });
+    const map = { Auto: 'auto-fields', 'Home & Property': 'home-fields', Travel: 'travel-fields', Business: 'business-fields', Specialty: 'specialty-fields', Liability: 'specialty-fields' };
+    if (map[type]) document.getElementById(map[type]).classList.add('visible');
+  }
+
+  /* ── TOGGLE BUTTONS ── */
+  function toggleBtn(el, groupId, show) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    if (groupId) {
+      const grp = document.getElementById(groupId);
+      if (show) grp.classList.add('visible');
+      else grp.classList.remove('visible');
+    }
+  }
+
+  /* ── VALIDATION ── */
+  function validate() {
+    if (currentStep === 1) {
+      // handled by selectClaimType
+    } else if (currentStep === 2) {
+      const policy = document.getElementById('policy-number').value.trim();
+      const first  = document.getElementById('first-name').value.trim();
+      const last   = document.getElementById('last-name').value.trim();
+      const email  = document.getElementById('email').value.trim();
+      const phone  = document.getElementById('phone').value.trim();
+      document.getElementById('step2-next').disabled = !(policy && first && last && email && phone);
+    } else if (currentStep === 3) {
+      const date = document.getElementById('loss-date').value;
+      const loc  = document.getElementById('loss-location').value.trim();
+      const desc = document.getElementById('loss-desc').value.trim();
+      document.getElementById('step3-next').disabled = !(date && loc && desc.length >= 10);
+    } else if (currentStep === 5) {
+      const certified = document.getElementById('certify-check').checked;
+      document.getElementById('submit-btn').disabled = !certified;
+    }
+  }
+
+  /* ── BUILD REVIEW ── */
+  function buildReview() {
+    const contactPref = document.querySelector('input[name="contact-pref"]:checked')?.value || '—';
+    let html = `
+      <div class="review-section">
+        <div class="review-section-title">Claim Type</div>
+        <div class="review-row"><span class="review-label">Type</span><span class="review-value">${claimType}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Policy & Contact</div>
+        <div class="review-row"><span class="review-label">Policy No.</span><span class="review-value">${v('policy-number')}</span></div>
+        <div class="review-row"><span class="review-label">Name</span><span class="review-value">${v('first-name')} ${v('last-name')}</span></div>
+        <div class="review-row"><span class="review-label">Email</span><span class="review-value">${v('email')}</span></div>
+        <div class="review-row"><span class="review-label">Phone</span><span class="review-value">${v('phone')}</span></div>
+        <div class="review-row"><span class="review-label">Contact Pref.</span><span class="review-value">${contactPref}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Incident</div>
+        <div class="review-row"><span class="review-label">Date of Loss</span><span class="review-value">${v('loss-date')}</span></div>
+        <div class="review-row"><span class="review-label">Location</span><span class="review-value">${v('loss-location')}</span></div>
+        <div class="review-row"><span class="review-label">Description</span><span class="review-value" style="max-width:180px;word-break:break-word;">${v('loss-desc').substring(0, 80)}${v('loss-desc').length > 80 ? '…' : ''}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Documents</div>
+        <div class="review-row"><span class="review-label">Photos</span><span class="review-value">${photoFiles.length} file${photoFiles.length !== 1 ? 's' : ''}</span></div>
+        <div class="review-row"><span class="review-label">Documents</span><span class="review-value">${docFiles.length} file${docFiles.length !== 1 ? 's' : ''}</span></div>
+      </div>
+    `;
+    document.getElementById('review-content').innerHTML = html;
+    validate();
+  }
+
+  function v(id) {
+    return (document.getElementById(id)?.value || '').trim() || '—';
+  }
+
+  /* ── SUBMIT ── */
+  function submitClaim() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Submitting…';
+
+    const claimNum = 'CHB-2026-' + Math.floor(100000 + Math.random() * 900000);
+
+    const payload = {
+      action: 'new-claim',
+      claimNumber: claimNum,
+      claimType,
+      policy: {
+        number: v('policy-number'),
+        firstName: v('first-name'),
+        lastName: v('last-name'),
+        email: v('email'),
+        phone: v('phone'),
+        contactPreference: document.querySelector('input[name="contact-pref"]:checked')?.value
+      },
+      incident: {
+        dateOfLoss: v('loss-date'),
+        time: v('loss-time'),
+        location: v('loss-location'),
+        description: v('loss-desc')
+      },
+      files: {
+        photos: photoFiles.length,
+        documents: docFiles.length
+      },
+      submittedAt: new Date().toISOString()
+    };
+
+    console.log('📤 Claim Submitted:', JSON.stringify(payload, null, 2));
+
+    setTimeout(() => {
+      document.getElementById('generated-claim-number').textContent = claimNum;
+      document.querySelector('.progress-wrap').style.display = 'none';
+      goTo(6);
+      btn.disabled = false;
+      btn.innerHTML = 'Submit Claim';
+    }, 1800);
+  }
+
+  /* ── PHOTO UPLOAD ── */
+  function handlePhotoSelect(e) { processPhotos(Array.from(e.target.files)); }
+
+  function processPhotos(files) {
+    const imgs = files.filter(f => f.type.startsWith('image/'));
+    photoFiles = [...photoFiles, ...imgs].slice(0, 16);
+    renderPhotoGrid();
+  }
+
+  function renderPhotoGrid() {
+    const grid = document.getElementById('photo-grid');
+    grid.innerHTML = '';
+    photoFiles.forEach((file, i) => {
+      const url = URL.createObjectURL(file);
+      const thumb = document.createElement('div');
+      thumb.className = 'photo-thumb';
+      thumb.innerHTML = `<img src="${url}" alt="Photo ${i+1}"><button class="remove-btn" onclick="removePhoto(${i})">×</button>`;
+      grid.appendChild(thumb);
+    });
+  }
+
+  function removePhoto(i) {
+    photoFiles.splice(i, 1);
+    renderPhotoGrid();
+  }
+
+  /* ── DOC UPLOAD ── */
+  function handleDocSelect(e) { processDocs(Array.from(e.target.files)); }
+
+  function processDocs(files) {
+    docFiles = [...docFiles, ...files].slice(0, 10);
+    renderDocList();
+  }
+
+  function removeDoc(i) {
+    docFiles.splice(i, 1);
+    renderDocList();
+  }
+
+  function renderDocList() {
+    const list = document.getElementById('doc-list');
+    list.innerHTML = '';
+    docFiles.forEach((file, i) => {
+      const ext = file.name.split('.').pop().toUpperCase();
+      const size = file.size < 1048576 ? (file.size / 1024).toFixed(0) + ' KB' : (file.size / 1048576).toFixed(1) + ' MB';
+      const icons = { PDF: '📄', DOC: '📝', DOCX: '📝', XLS: '📊', XLSX: '📊' };
+      const icon = icons[ext] || '📎';
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `
+        <span class="file-item-icon">${icon}</span>
+        <span class="file-item-name">${file.name}</span>
+        <span class="file-item-size">${size}</span>
+        <button class="file-item-remove" onclick="removeDoc(${i})">×</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  /* ── DRAG & DROP ── */
+  function handleDragOver(zoneId, e) {
+    e.preventDefault();
+    document.getElementById(zoneId).classList.add('dragover');
+  }
+  function handleDragLeave(zoneId, e) {
+    document.getElementById(zoneId).classList.remove('dragover');
+  }
+  function handleDrop(zoneId, e) {
+    e.preventDefault();
+    document.getElementById(zoneId).classList.remove('dragover');
+    processPhotos(Array.from(e.dataTransfer.files));
+  }
+  function handleDocDrop(zoneId, e) {
+    e.preventDefault();
+    document.getElementById(zoneId).classList.remove('dragover');
+    processDocs(Array.from(e.dataTransfer.files));
+  }
+</script>
+
+</body>
+</html>
