@@ -1132,8 +1132,8 @@
 </div>
 
 <script>
-  // ── GREETING: pull firstName from Cognigy session context ──────────
-  (function () {
+  // ── GREETING: pull context.firstName from Cognigy session context ────
+  function applyFirstName() {
     try {
       var ctx = cognigyWebchat.getSessionState().context;
       var firstName = ctx && ctx.firstName ? ctx.firstName : null;
@@ -1144,9 +1144,17 @@
           : 'Welcome back.';
       }
     } catch (e) {
-      // Cognigy SDK not available during local preview — neutral fallback shown
+      // SDK not ready yet — will retry on webchatReady
     }
-  })();
+  }
+
+  // Wait for the Cognigy webchat SDK to be ready before reading context
+  window.addEventListener('webchatReady', function () {
+    applyFirstName();
+  });
+
+  // Also try immediately in case the event already fired
+  applyFirstName();
 
   // ── TAB SWITCHING ─────────────────────────────────────────
   function switchTab(tab) {
