@@ -827,7 +827,7 @@
           <div class="date-block right">
             <div class="date-label">Check-out</div>
             <div class="date-val">May 24</div>
-            <div class="date-day">Funday</div>
+            <div class="date-day">Sunday</div>
           </div>
         </div>
         <div class="res-details-row">
@@ -994,11 +994,11 @@
     <div class="form-row" style="margin-bottom:18px">
       <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Check-in Date</label>
-        <input type="date" class="form-input" value="2026-05-21" />
+        <input type="date" class="form-input" id="checkin-date" value="2026-05-21" />
       </div>
       <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Check-out Date</label>
-        <input type="date" class="form-input" value="2026-05-24" />
+        <input type="date" class="form-input" id="checkout-date" value="2026-05-24" />
       </div>
     </div>
 
@@ -1034,7 +1034,7 @@
 
     <div class="form-group">
       <label class="form-label">Number of Guests</label>
-      <select class="form-select">
+      <select class="form-select" id="guest-count">
         <option>1 Guest</option>
         <option selected>2 Guests</option>
         <option>3 Guests</option>
@@ -1044,8 +1044,7 @@
 
     <div class="form-group">
       <label class="form-label">Special Requests</label>
-      <textarea class="form-input" rows="3" style="resize:none; line-height:1.5"
-        placeholder="Early check-in, extra pillows, anniversary setup…"></textarea>
+      <textarea class="form-input" id="special-requests" rows="3" style="resize:none; line-height:1.5" placeholder="Early check-in, extra pillows, anniversary setup…"></textarea>
     </div>
 
     <button class="submit-btn" onclick="submitModify()">Save Changes</button>
@@ -1256,25 +1255,75 @@
   }
 
   // ── ACTIONS ───────────────────────────────────────────────
+
+  // Submit payload to Cognigy and store under context.reservationUpdates
+  function submitToCognigy(payload) {
+    try {
+      SDK.submit({
+        value: {
+          reservationUpdates: payload
+        }
+      });
+    } catch (e) {
+      console.warn('Cognigy SDK not available:', e);
+    }
+  }
+
   function submitModify() {
+    // Collect form values
+    var checkinDate    = document.getElementById('checkin-date')  ? document.getElementById('checkin-date').value   : null;
+    var checkoutDate   = document.getElementById('checkout-date') ? document.getElementById('checkout-date').value  : null;
+    var guestCount     = document.getElementById('guest-count')   ? document.getElementById('guest-count').value    : null;
+    var specialReqs    = document.getElementById('special-requests') ? document.getElementById('special-requests').value.trim() : null;
+    var selectedRoom   = document.querySelector('#modify-sheet .radio-option.selected .radio-title');
+    var roomType       = selectedRoom ? selectedRoom.textContent.trim() : null;
+
+    var payload = {
+      action:          'modify_reservation',
+      confirmationNumber: 'PH8821',
+      checkInDate:     checkinDate,
+      checkOutDate:    checkoutDate,
+      roomType:        roomType,
+      guests:          guestCount,
+      specialRequests: specialReqs || null,
+      timestamp:       new Date().toISOString()
+    };
+
+    submitToCognigy(payload);
     closeAllSheets();
     setTimeout(() => showToast('Reservation updated successfully'), 200);
-    // SDK.submit({ value: { action: 'modify_reservation', confirmationNumber: 'PH8821', ... } })
   }
 
   function submitUpsell() {
     const selected = document.querySelector('#upsell-sheet .radio-option.selected');
-    const name = selected ? selected.querySelector('.radio-title').textContent : 'enhancement';
+    const name = selected ? selected.querySelector('.radio-title').textContent.trim() : null;
+    if (!name) { showToast('Please select an option first'); return; }
+
+    var payload = {
+      action:            'add_upsell',
+      confirmationNumber: 'PH8821',
+      upsellItem:        name,
+      timestamp:         new Date().toISOString()
+    };
+
+    submitToCognigy(payload);
     closeAllSheets();
     setTimeout(() => showToast(`${name} added to your stay`), 200);
-    // SDK.submit({ value: { action: 'add_upsell', item: name, reservationId: 'PH8821' } })
   }
 
   function addUpsell(e, name) {
     e.stopPropagation();
+
+    var payload = {
+      action:            'add_upsell',
+      confirmationNumber: 'PH8821',
+      upsellItem:        name,
+      timestamp:         new Date().toISOString()
+    };
+
+    submitToCognigy(payload);
     closeAllSheets();
     setTimeout(() => showToast(`${name} added to your stay`), 200);
-    // SDK.submit({ value: { action: 'add_upsell', item: name } })
   }
 
   // ── TOAST ─────────────────────────────────────────────────
