@@ -1,116 +1,3 @@
-
-Claude finished the response
-I need an xApp for Cognigy, it is for Hyatt hotels and it is to view current reservations. We also want the options to update reservation and offer upsell options to the user. Use Hyatt branding and color scheme.
-
-May 18
-
-Reading frontend design skill
-Reading frontend design skill
-Now let me build the Hyatt xApp. I'll create a polished, luxury hotel-branded xApp with Hyatt's signature gold/black/white color scheme.
-
-
-Created a file, read a file
-Created a file, read a file
-Here's your Hyatt Reservations xApp! Here's what's built in:
-
-Branding
-
-Hyatt's signature dark/gold/cream palette with Playfair Display for headings and Jost for body text
-World of Hyatt member header with points, nights, and status displayed
-Reservation View
-
-Cards with hotel photography, property name, location, confirmation number, room type, and guest count
-Check-in/check-out dates with nights count
-Status badges (Check-in Today, Upcoming, Confirmed)
-Two tabs: Upcoming and Past Stays (with rebook option)
-Modify Reservation (bottom sheet)
-
-Date picker for check-in/check-out
-Room type upgrade selector with pricing deltas
-Guest count and special requests field
-Upsell Options (two entry points — horizontal scroll cards + full sheet)
-
-Spa Package, Chef's Table, Suite Upgrade, Airport Transfer, Romance Package
-Detail sheets with imagery and pricing for each upsell
-Each upsell taps into SDK.submit() when wired to Cognigy
-Cognigy Integration Notes The SDK.submit() calls are stubbed as comments throughout — you'll find them in submitModify(), submitUpsell(), and addUpsell(). The payload structure follows the { value: { action, item, reservationId } } pattern you've used on your other xApps. Let me know if you want to wire in specific Cognigy context variables (e.g. pulling live reservation data from cognigyWebchat.getSessionState().context).
-
-
-Hyatt reservations xapp
-Code · HTML 
-Looking good, the demo will be for this Thursday so if you can modify the dates.
-
-May 18
-
-Check current time
-Check current time
-Thursday is May 21. I'll update the check-in card to show May 21 as "Check-in Today" and adjust the checkout to May 24.
-
-
-Edited 4 files, read a file
-Edited 4 files, read a file
-Done! Updated the Park Hyatt Chicago card to May 21 (Thursday) → May 24 (Funday) — so the "Check-in Today" badge will match perfectly for your Thursday demo. The modify sheet date pickers are updated to match as well. Good luck with the demo!
-
-
-Hyatt reservations xapp
-Code · HTML 
-Next can we make the "greeting name" to be Welcome back, {{contect.firstName}} that is pulled from the current context file?
-Ask questions if you need clarity.
-
-1:08 PM
-Quick clarification before I make the change — when you say "context file," do you mean the Cognigy session context accessed via cognigyWebchat.getSessionState().context.firstName, or are you referring to a separate JSON/config file you'd like me to reference?
-
-Also, just flagging the typo in your message — you wrote contect.firstName. I'll assume that should be context.firstName, but want to confirm the exact key name before updating.
-
-The Cognigy session context
-
-1:09 PM
-Got it!
-
-
-Ran 4 commands, viewed 3 files, edited 2 files
-Ran 4 commands, viewed 3 files, edited 2 files
-The JS injection didn't find the exact comment string due to encoding. Let me add it cleanly via a known unique anchor instead.
-
-
-Ran 3 commands, viewed a file
-Ran 3 commands, viewed a file
-All in. Let me present the updated file.
-
-
-Presented file
-Presented file
-Done! Here's what changed:
-
-HTML — the greeting div now has an id="greeting-name" and a neutral default of "Welcome back."
-
-JavaScript — an IIFE runs on load that does:
-
-js
-var ctx = cognigyWebchat.getSessionState().context;
-var firstName = ctx && ctx.firstName ? ctx.firstName : null;
-el.textContent = firstName ? 'Welcome back, ' + firstName + '.' : 'Welcome back.';
-It's wrapped in a try/catch so it degrades gracefully — if the Cognigy SDK isn't present (e.g. local preview), it just shows "Welcome back." without throwing an error. Once deployed in the Cognigy webchat, it'll pull context.firstName live from the session.
-
-
-Hyatt reservations xapp
-Code · HTML 
-So sorry, it is {{context.firstName}}
-
-1:21 PM
-No worries! That's just the Cognigy token syntax used in Flow editors — under the hood it still resolves to cognigyWebchat.getSessionState().context.firstName, which is exactly what's already wired up. No code change needed.
-
-When you're placing the xApp in your Flow, you can reference it either way — the JavaScript in the xApp reads directly from the session context at runtime, same data either way.
-
-
-Want to be notified when Claude responds?
-
-
-
-Claude is AI and can make mistakes. Please double-check responses.
-Hyatt reservations xapp · HTML
-Copy
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,9 +19,9 @@ Copy
     --radius-lg:     20px;
     --transition:    0.3s cubic-bezier(0.4,0,0.2,1);
   }
- 
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   body {
     font-family: 'Jost', sans-serif;
     background: var(--hyatt-light);
@@ -142,7 +29,7 @@ Copy
     min-height: 100vh;
     overflow-x: hidden;
   }
- 
+
   /* ── HEADER ─────────────────────────────────────────── */
   .header {
     background: var(--hyatt-dark);
@@ -155,13 +42,13 @@ Copy
     z-index: 100;
     box-shadow: 0 2px 16px rgba(0,0,0,0.35);
   }
- 
+
   .header-logo {
     display: flex;
     align-items: center;
     gap: 10px;
   }
- 
+
   .logo-wordmark {
     font-family: 'Playfair Display', serif;
     font-size: 22px;
@@ -170,7 +57,7 @@ Copy
     letter-spacing: 5px;
     text-transform: uppercase;
   }
- 
+
   .logo-dot {
     width: 6px;
     height: 6px;
@@ -180,7 +67,7 @@ Copy
     margin-left: 3px;
     vertical-align: middle;
   }
- 
+
   .header-subtitle {
     font-size: 10px;
     color: var(--hyatt-gold);
@@ -189,7 +76,7 @@ Copy
     font-weight: 400;
     margin-top: 2px;
   }
- 
+
   .member-badge {
     background: linear-gradient(135deg, var(--hyatt-gold), var(--hyatt-gold-lt));
     color: var(--hyatt-dark);
@@ -200,7 +87,7 @@ Copy
     padding: 5px 10px;
     border-radius: 20px;
   }
- 
+
   /* ── GREETING ───────────────────────────────────────── */
   .greeting {
     background: var(--hyatt-charcoal);
@@ -208,27 +95,27 @@ Copy
     color: var(--hyatt-white);
     border-bottom: 1px solid rgba(184,147,63,0.3);
   }
- 
+
   .greeting-name {
     font-family: 'Playfair Display', serif;
     font-size: 20px;
     font-weight: 500;
     margin-bottom: 4px;
   }
- 
+
   .greeting-sub {
     font-size: 13px;
     color: rgba(255,255,255,0.55);
     font-weight: 300;
     letter-spacing: 0.3px;
   }
- 
+
   .points-strip {
     display: flex;
     gap: 12px;
     margin-top: 14px;
   }
- 
+
   .points-pill {
     background: rgba(184,147,63,0.15);
     border: 1px solid rgba(184,147,63,0.35);
@@ -239,14 +126,14 @@ Copy
     align-items: center;
     flex: 1;
   }
- 
+
   .points-val {
     font-size: 16px;
     font-weight: 600;
     color: var(--hyatt-gold-lt);
     letter-spacing: 0.5px;
   }
- 
+
   .points-lbl {
     font-size: 10px;
     color: rgba(255,255,255,0.5);
@@ -254,7 +141,7 @@ Copy
     text-transform: uppercase;
     margin-top: 2px;
   }
- 
+
   /* ── TABS ────────────────────────────────────────────── */
   .tabs {
     display: flex;
@@ -265,7 +152,7 @@ Copy
     top: 64px;
     z-index: 90;
   }
- 
+
   .tab {
     flex: 1;
     padding: 14px 8px;
@@ -279,17 +166,17 @@ Copy
     border-bottom: 2px solid transparent;
     transition: var(--transition);
   }
- 
+
   .tab.active {
     color: var(--hyatt-dark);
     border-bottom-color: var(--hyatt-gold);
   }
- 
+
   /* ── MAIN CONTENT ───────────────────────────────────── */
   .content {
     padding: 20px 16px 100px;
   }
- 
+
   .section-label {
     font-size: 11px;
     font-weight: 600;
@@ -299,7 +186,7 @@ Copy
     margin-bottom: 12px;
     padding-left: 2px;
   }
- 
+
   /* ── RESERVATION CARD ──────────────────────────────── */
   .res-card {
     background: var(--hyatt-white);
@@ -311,40 +198,40 @@ Copy
     transition: var(--transition);
     animation: slideUp 0.4s ease both;
   }
- 
+
   .res-card:nth-child(2) { animation-delay: 0.08s; }
   .res-card:nth-child(3) { animation-delay: 0.16s; }
- 
+
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
   }
- 
+
   .res-card-hero {
     height: 130px;
     position: relative;
     overflow: hidden;
   }
- 
+
   .res-card-hero img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
- 
+
   .hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%);
   }
- 
+
   .hero-property {
     position: absolute;
     bottom: 12px;
     left: 14px;
     right: 14px;
   }
- 
+
   .hero-name {
     font-family: 'Playfair Display', serif;
     font-size: 17px;
@@ -352,14 +239,14 @@ Copy
     color: var(--hyatt-white);
     line-height: 1.2;
   }
- 
+
   .hero-loc {
     font-size: 11px;
     color: rgba(255,255,255,0.75);
     letter-spacing: 0.5px;
     margin-top: 2px;
   }
- 
+
   .hero-status {
     position: absolute;
     top: 10px;
@@ -371,15 +258,15 @@ Copy
     letter-spacing: 1px;
     text-transform: uppercase;
   }
- 
+
   .status-confirmed { background: rgba(40,167,69,0.9); color: #fff; }
   .status-upcoming  { background: rgba(184,147,63,0.9); color: #1a1a1a; }
   .status-checkin   { background: rgba(13,110,253,0.9); color: #fff; }
- 
+
   .res-card-body {
     padding: 14px 16px 0;
   }
- 
+
   .dates-row {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -387,10 +274,10 @@ Copy
     gap: 8px;
     margin-bottom: 14px;
   }
- 
+
   .date-block { }
   .date-block.right { text-align: right; }
- 
+
   .date-label {
     font-size: 10px;
     color: var(--hyatt-mid);
@@ -398,27 +285,27 @@ Copy
     text-transform: uppercase;
     font-weight: 500;
   }
- 
+
   .date-val {
     font-size: 15px;
     font-weight: 600;
     color: var(--hyatt-dark);
     margin-top: 2px;
   }
- 
+
   .date-day {
     font-size: 11px;
     color: var(--hyatt-mid);
     font-weight: 400;
   }
- 
+
   .date-divider {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 3px;
   }
- 
+
   .nights-badge {
     background: var(--hyatt-light);
     border: 1px solid var(--hyatt-border);
@@ -429,20 +316,20 @@ Copy
     color: var(--hyatt-gold);
     white-space: nowrap;
   }
- 
+
   .arrow-line {
     width: 32px;
     height: 1px;
     background: var(--hyatt-border);
   }
- 
+
   .res-details-row {
     display: flex;
     gap: 6px;
     margin-bottom: 14px;
     flex-wrap: wrap;
   }
- 
+
   .res-chip {
     background: var(--hyatt-light);
     border: 1px solid var(--hyatt-border);
@@ -455,9 +342,9 @@ Copy
     align-items: center;
     gap: 5px;
   }
- 
+
   .chip-icon { font-size: 12px; }
- 
+
   .res-card-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -465,7 +352,7 @@ Copy
     border-top: 1px solid var(--hyatt-border);
     margin-top: 4px;
   }
- 
+
   .action-btn {
     padding: 13px 10px;
     text-align: center;
@@ -479,17 +366,17 @@ Copy
     background: transparent;
     font-family: 'Jost', sans-serif;
   }
- 
+
   .action-btn:first-child { border-right: 1px solid var(--hyatt-border); }
- 
+
   .action-btn.primary { color: var(--hyatt-gold); }
   .action-btn.primary:active { background: rgba(184,147,63,0.08); }
   .action-btn.secondary { color: var(--hyatt-mid); }
   .action-btn.secondary:active { background: var(--hyatt-light); }
- 
+
   /* ── UPSELL SECTION ──────────────────────────────────── */
   .upsell-section { margin-top: 8px; }
- 
+
   .upsell-scroll {
     display: flex;
     gap: 12px;
@@ -498,7 +385,7 @@ Copy
     scrollbar-width: none;
   }
   .upsell-scroll::-webkit-scrollbar { display: none; }
- 
+
   .upsell-card {
     flex: 0 0 180px;
     background: var(--hyatt-white);
@@ -510,24 +397,24 @@ Copy
     transition: var(--transition);
     animation: slideUp 0.5s ease both;
   }
- 
+
   .upsell-card:nth-child(1) { animation-delay: 0.1s; }
   .upsell-card:nth-child(2) { animation-delay: 0.2s; }
   .upsell-card:nth-child(3) { animation-delay: 0.3s; }
- 
+
   .upsell-card:active { transform: scale(0.97); }
- 
+
   .upsell-img {
     height: 100px;
     width: 100%;
     object-fit: cover;
     display: block;
   }
- 
+
   .upsell-body {
     padding: 10px 12px 12px;
   }
- 
+
   .upsell-category {
     font-size: 9px;
     font-weight: 600;
@@ -536,7 +423,7 @@ Copy
     color: var(--hyatt-gold);
     margin-bottom: 4px;
   }
- 
+
   .upsell-title {
     font-family: 'Playfair Display', serif;
     font-size: 13px;
@@ -545,17 +432,17 @@ Copy
     line-height: 1.3;
     margin-bottom: 6px;
   }
- 
+
   .upsell-price {
     font-size: 12px;
     color: var(--hyatt-mid);
   }
- 
+
   .upsell-price strong {
     color: var(--hyatt-dark);
     font-weight: 600;
   }
- 
+
   .upsell-add-btn {
     display: block;
     width: 100%;
@@ -573,9 +460,9 @@ Copy
     font-family: 'Jost', sans-serif;
     transition: var(--transition);
   }
- 
+
   .upsell-add-btn:active { background: var(--hyatt-gold); color: var(--hyatt-dark); }
- 
+
   /* ── BOTTOM SHEETS ───────────────────────────────────── */
   .overlay {
     position: fixed;
@@ -587,9 +474,9 @@ Copy
     transition: opacity var(--transition);
     backdrop-filter: blur(3px);
   }
- 
+
   .overlay.open { opacity: 1; pointer-events: all; }
- 
+
   .sheet {
     position: fixed;
     bottom: 0;
@@ -604,9 +491,9 @@ Copy
     overflow-y: auto;
     padding-bottom: env(safe-area-inset-bottom, 16px);
   }
- 
+
   .sheet.open { transform: translateY(0); }
- 
+
   .sheet-handle {
     width: 36px;
     height: 4px;
@@ -614,7 +501,7 @@ Copy
     border-radius: 2px;
     margin: 12px auto 0;
   }
- 
+
   .sheet-header {
     padding: 16px 20px 14px;
     border-bottom: 1px solid var(--hyatt-border);
@@ -622,13 +509,13 @@ Copy
     align-items: center;
     justify-content: space-between;
   }
- 
+
   .sheet-title {
     font-family: 'Playfair Display', serif;
     font-size: 18px;
     font-weight: 500;
   }
- 
+
   .sheet-close {
     width: 30px;
     height: 30px;
@@ -642,12 +529,12 @@ Copy
     font-size: 16px;
     color: var(--hyatt-mid);
   }
- 
+
   .sheet-body { padding: 20px; }
- 
+
   /* ── FORM ELEMENTS ───────────────────────────────────── */
   .form-group { margin-bottom: 18px; }
- 
+
   .form-label {
     display: block;
     font-size: 11px;
@@ -657,7 +544,7 @@ Copy
     color: var(--hyatt-mid);
     margin-bottom: 8px;
   }
- 
+
   .form-input, .form-select {
     width: 100%;
     padding: 12px 14px;
@@ -671,15 +558,15 @@ Copy
     transition: border-color var(--transition);
     -webkit-appearance: none;
   }
- 
+
   .form-input:focus, .form-select:focus {
     border-color: var(--hyatt-gold);
   }
- 
+
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
- 
+
   .radio-group { display: flex; flex-direction: column; gap: 8px; }
- 
+
   .radio-option {
     display: flex;
     align-items: center;
@@ -690,12 +577,12 @@ Copy
     cursor: pointer;
     transition: var(--transition);
   }
- 
+
   .radio-option.selected {
     border-color: var(--hyatt-gold);
     background: rgba(184,147,63,0.05);
   }
- 
+
   .radio-dot {
     width: 18px;
     height: 18px;
@@ -707,12 +594,12 @@ Copy
     justify-content: center;
     transition: var(--transition);
   }
- 
+
   .radio-option.selected .radio-dot {
     border-color: var(--hyatt-gold);
     background: var(--hyatt-gold);
   }
- 
+
   .radio-option.selected .radio-dot::after {
     content: '';
     width: 6px;
@@ -720,12 +607,12 @@ Copy
     background: white;
     border-radius: 50%;
   }
- 
+
   .radio-text { flex: 1; }
   .radio-title { font-size: 14px; font-weight: 500; }
   .radio-desc { font-size: 12px; color: var(--hyatt-mid); margin-top: 1px; }
   .radio-price { font-size: 13px; font-weight: 600; color: var(--hyatt-gold); }
- 
+
   .submit-btn {
     width: 100%;
     padding: 15px;
@@ -742,14 +629,14 @@ Copy
     transition: var(--transition);
     margin-top: 8px;
   }
- 
+
   .submit-btn:active { background: var(--hyatt-gold); color: var(--hyatt-dark); }
- 
+
   .gold-btn {
     background: linear-gradient(135deg, var(--hyatt-gold), var(--hyatt-gold-lt));
     color: var(--hyatt-dark);
   }
- 
+
   /* ── UPSELL DETAIL SHEET ─────────────────────────────── */
   .upsell-hero-img {
     width: 100%;
@@ -758,21 +645,21 @@ Copy
     border-radius: 16px;
     margin-bottom: 16px;
   }
- 
+
   .upsell-detail-title {
     font-family: 'Playfair Display', serif;
     font-size: 22px;
     font-weight: 500;
     margin-bottom: 6px;
   }
- 
+
   .upsell-detail-sub {
     font-size: 13px;
     color: var(--hyatt-mid);
     line-height: 1.6;
     margin-bottom: 18px;
   }
- 
+
   .upsell-price-row {
     display: flex;
     align-items: center;
@@ -783,11 +670,11 @@ Copy
     margin-bottom: 18px;
     border: 1px solid var(--hyatt-border);
   }
- 
+
   .price-lbl { font-size: 12px; color: var(--hyatt-mid); }
   .price-amt { font-size: 24px; font-weight: 600; color: var(--hyatt-dark); }
   .price-note { font-size: 11px; color: var(--hyatt-mid); }
- 
+
   /* ── SUCCESS TOAST ───────────────────────────────────── */
   .toast {
     position: fixed;
@@ -808,10 +695,10 @@ Copy
     align-items: center;
     gap: 8px;
   }
- 
+
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast-icon { color: var(--hyatt-gold-lt); font-size: 15px; }
- 
+
   /* ── PAST TAB ────────────────────────────────────────── */
   .past-item {
     background: var(--hyatt-white);
@@ -824,7 +711,7 @@ Copy
     border: 1px solid var(--hyatt-border);
     animation: slideUp 0.4s ease both;
   }
- 
+
   .past-icon {
     width: 44px;
     height: 44px;
@@ -836,12 +723,12 @@ Copy
     font-size: 20px;
     flex-shrink: 0;
   }
- 
+
   .past-info { flex: 1; }
   .past-hotel { font-size: 14px; font-weight: 600; }
   .past-dates { font-size: 12px; color: var(--hyatt-mid); margin-top: 2px; }
   .past-pts { font-size: 12px; font-weight: 600; color: var(--hyatt-gold); margin-top: 3px; }
- 
+
   .rebook-btn {
     border: 1.5px solid var(--hyatt-gold);
     color: var(--hyatt-gold);
@@ -856,10 +743,10 @@ Copy
     font-family: 'Jost', sans-serif;
     white-space: nowrap;
   }
- 
+
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
- 
+
   /* ── DIVIDER ─────────────────────────────────────────── */
   .gold-divider {
     height: 1px;
@@ -870,7 +757,7 @@ Copy
 </style>
 </head>
 <body>
- 
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-logo">
@@ -881,7 +768,7 @@ Copy
   </div>
   <div class="member-badge">World of Hyatt</div>
 </div>
- 
+
 <!-- GREETING -->
 <div class="greeting">
   <div class="greeting-name" id="greeting-name">Welcome back.</div>
@@ -901,21 +788,21 @@ Copy
     </div>
   </div>
 </div>
- 
+
 <!-- TABS -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('upcoming')">Upcoming</div>
   <div class="tab" onclick="switchTab('past')">Past Stays</div>
 </div>
- 
+
 <!-- CONTENT -->
 <div class="content">
- 
+
   <!-- UPCOMING TAB -->
   <div class="tab-panel active" id="tab-upcoming">
- 
+
     <div class="section-label">Your reservations</div>
- 
+
     <!-- CARD 1 -->
     <div class="res-card">
       <div class="res-card-hero">
@@ -954,7 +841,7 @@ Copy
         <button class="action-btn primary" onclick="openUpsellSheet()">✨ Enhance Stay</button>
       </div>
     </div>
- 
+
     <!-- CARD 2 -->
     <div class="res-card">
       <div class="res-card-hero">
@@ -993,14 +880,14 @@ Copy
         <button class="action-btn primary" onclick="openUpsellSheet()">✨ Enhance Stay</button>
       </div>
     </div>
- 
+
     <div class="gold-divider"></div>
- 
+
     <!-- UPSELL SECTION -->
     <div class="upsell-section">
       <div class="section-label">Recommended for your stay</div>
       <div class="upsell-scroll">
- 
+
         <div class="upsell-card" onclick="openUpsellDetail('spa')">
           <img class="upsell-img" src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80" alt="Spa" />
           <div class="upsell-body">
@@ -1010,7 +897,7 @@ Copy
             <button class="upsell-add-btn" onclick="addUpsell(event,'Signature Spa Package')">Add to Stay</button>
           </div>
         </div>
- 
+
         <div class="upsell-card" onclick="openUpsellDetail('dining')">
           <img class="upsell-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80" alt="Dining" />
           <div class="upsell-body">
@@ -1020,7 +907,7 @@ Copy
             <button class="upsell-add-btn" onclick="addUpsell(event, 'Chef\'s Table')">Add to Stay</button>
           </div>
         </div>
- 
+
         <div class="upsell-card" onclick="openUpsellDetail('room')">
           <img class="upsell-img" src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80" alt="Suite Upgrade" />
           <div class="upsell-body">
@@ -1030,7 +917,7 @@ Copy
             <button class="upsell-add-btn" onclick="addUpsell(event,'Suite Upgrade')">Add to Stay</button>
           </div>
         </div>
- 
+
         <div class="upsell-card" onclick="openUpsellDetail('transfer')">
           <img class="upsell-img" src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=400&q=80" alt="Transfer" />
           <div class="upsell-body">
@@ -1040,16 +927,16 @@ Copy
             <button class="upsell-add-btn" onclick="addUpsell(event,'Airport Transfer')">Add to Stay</button>
           </div>
         </div>
- 
+
       </div>
     </div>
- 
+
   </div>
- 
+
   <!-- PAST STAYS TAB -->
   <div class="tab-panel" id="tab-past">
     <div class="section-label">Recent stays</div>
- 
+
     <div class="past-item">
       <div class="past-icon">🏙️</div>
       <div class="past-info">
@@ -1059,7 +946,7 @@ Copy
       </div>
       <button class="rebook-btn" onclick="showToast('Rebook request sent!')">Rebook</button>
     </div>
- 
+
     <div class="past-item">
       <div class="past-icon">🌴</div>
       <div class="past-info">
@@ -1069,7 +956,7 @@ Copy
       </div>
       <button class="rebook-btn" onclick="showToast('Rebook request sent!')">Rebook</button>
     </div>
- 
+
     <div class="past-item">
       <div class="past-icon">🌆</div>
       <div class="past-info">
@@ -1079,7 +966,7 @@ Copy
       </div>
       <button class="rebook-btn" onclick="showToast('Rebook request sent!')">Rebook</button>
     </div>
- 
+
     <div class="past-item">
       <div class="past-icon">🏝️</div>
       <div class="past-info">
@@ -1090,12 +977,12 @@ Copy
       <button class="rebook-btn" onclick="showToast('Rebook request sent!')">Rebook</button>
     </div>
   </div>
- 
+
 </div>
- 
+
 <!-- ── MODIFY SHEET ──────────────────────────────────────── -->
 <div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
- 
+
 <div class="sheet" id="modify-sheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
@@ -1103,7 +990,7 @@ Copy
     <button class="sheet-close" onclick="closeAllSheets()">✕</button>
   </div>
   <div class="sheet-body">
- 
+
     <div class="form-row" style="margin-bottom:18px">
       <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Check-in Date</label>
@@ -1114,7 +1001,7 @@ Copy
         <input type="date" class="form-input" value="2026-05-24" />
       </div>
     </div>
- 
+
     <div class="form-group">
       <label class="form-label">Room Type</label>
       <div class="radio-group">
@@ -1144,7 +1031,7 @@ Copy
         </div>
       </div>
     </div>
- 
+
     <div class="form-group">
       <label class="form-label">Number of Guests</label>
       <select class="form-select">
@@ -1154,18 +1041,18 @@ Copy
         <option>4 Guests</option>
       </select>
     </div>
- 
+
     <div class="form-group">
       <label class="form-label">Special Requests</label>
       <textarea class="form-input" rows="3" style="resize:none; line-height:1.5"
         placeholder="Early check-in, extra pillows, anniversary setup…"></textarea>
     </div>
- 
+
     <button class="submit-btn" onclick="submitModify()">Save Changes</button>
- 
+
   </div>
 </div>
- 
+
 <!-- ── UPSELL LIST SHEET ──────────────────────────────────── -->
 <div class="sheet" id="upsell-sheet">
   <div class="sheet-handle"></div>
@@ -1174,11 +1061,11 @@ Copy
     <button class="sheet-close" onclick="closeAllSheets()">✕</button>
   </div>
   <div class="sheet-body">
- 
+
     <div style="font-size:13px;color:var(--hyatt-mid);margin-bottom:20px;line-height:1.6">
       Curated experiences tailored to make your stay unforgettable.
     </div>
- 
+
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="radio-option" onclick="selectRadio(this);openUpsellDetail('spa')">
         <span style="font-size:22px">🧖</span>
@@ -1221,12 +1108,12 @@ Copy
         <div class="radio-price">$75</div>
       </div>
     </div>
- 
+
     <button class="submit-btn gold-btn" style="margin-top:20px" onclick="submitUpsell()">Add Selected to Reservation</button>
- 
+
   </div>
 </div>
- 
+
 <!-- ── UPSELL DETAIL SHEET ───────────────────────────────── -->
 <div class="sheet" id="detail-sheet">
   <div class="sheet-handle"></div>
@@ -1237,13 +1124,13 @@ Copy
   <div class="sheet-body" id="detail-body">
   </div>
 </div>
- 
+
 <!-- TOAST -->
 <div class="toast" id="toast">
   <span class="toast-icon">✦</span>
   <span id="toast-msg">Changes saved successfully</span>
 </div>
- 
+
 <script>
   // ── GREETING: pull firstName from Cognigy session context ──────────
   (function () {
@@ -1260,7 +1147,7 @@ Copy
       // Cognigy SDK not available during local preview — neutral fallback shown
     }
   })();
- 
+
   // ── TAB SWITCHING ─────────────────────────────────────────
   function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1268,10 +1155,10 @@ Copy
     event.currentTarget.classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
   }
- 
+
   // ── SHEET MANAGEMENT ──────────────────────────────────────
   let activeSheet = null;
- 
+
   function openSheet(sheetId, title) {
     if (title && document.getElementById('modify-sheet-title')) {
       document.getElementById('modify-sheet-title').textContent = 'Modify · ' + title;
@@ -1281,20 +1168,20 @@ Copy
     activeSheet = sheetId;
     event.stopPropagation();
   }
- 
+
   function openUpsellSheet() {
     document.getElementById('overlay').classList.add('open');
     document.getElementById('upsell-sheet').classList.add('open');
     activeSheet = 'upsell-sheet';
     event.stopPropagation();
   }
- 
+
   function closeAllSheets() {
     document.getElementById('overlay').classList.remove('open');
     document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
     activeSheet = null;
   }
- 
+
   // ── UPSELL DETAIL ─────────────────────────────────────────
   const upsellData = {
     spa: {
@@ -1326,7 +1213,7 @@ Copy
       note: 'Per trip one-way · Gratuity included'
     }
   };
- 
+
   function openUpsellDetail(type) {
     const d = upsellData[type];
     if (!d) return;
@@ -1350,7 +1237,7 @@ Copy
     document.getElementById('detail-sheet').classList.add('open');
     activeSheet = 'detail-sheet';
   }
- 
+
   // ── RADIO SELECT ──────────────────────────────────────────
   function selectRadio(el) {
     const group = el.closest('.radio-group, .sheet-body');
@@ -1359,14 +1246,14 @@ Copy
     }
     el.classList.add('selected');
   }
- 
+
   // ── ACTIONS ───────────────────────────────────────────────
   function submitModify() {
     closeAllSheets();
     setTimeout(() => showToast('Reservation updated successfully'), 200);
     // SDK.submit({ value: { action: 'modify_reservation', confirmationNumber: 'PH8821', ... } })
   }
- 
+
   function submitUpsell() {
     const selected = document.querySelector('#upsell-sheet .radio-option.selected');
     const name = selected ? selected.querySelector('.radio-title').textContent : 'enhancement';
@@ -1374,14 +1261,14 @@ Copy
     setTimeout(() => showToast(`${name} added to your stay`), 200);
     // SDK.submit({ value: { action: 'add_upsell', item: name, reservationId: 'PH8821' } })
   }
- 
+
   function addUpsell(e, name) {
     e.stopPropagation();
     closeAllSheets();
     setTimeout(() => showToast(`${name} added to your stay`), 200);
     // SDK.submit({ value: { action: 'add_upsell', item: name } })
   }
- 
+
   // ── TOAST ─────────────────────────────────────────────────
   let toastTimer;
   function showToast(msg) {
@@ -1394,4 +1281,3 @@ Copy
 </script>
 </body>
 </html>
- 
