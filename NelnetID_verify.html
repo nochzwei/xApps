@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nelnet — Verify Your Information</title>
+<style>
+  :root {
+    --nelnet-green: #BACA2A;
+    --nelnet-green-dark: #9FAE1F;
+    --nelnet-grey: #A4AAAD;
+    --ink: #1E2422;
+    --ink-soft: #5B6360;
+    --paper: #FFFFFF;
+    --paper-tint: #F6F7F2;
+    --line: #E4E7DF;
+    --danger: #C0392B;
+    --danger-tint: #FBEBE9;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(30,36,34,0.06), 0 8px 24px rgba(30,36,34,0.06);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper-tint);
+    color: var(--ink);
+  }
+
+  .card {
+    max-width: 420px;
+    margin: 0 auto;
+    background: var(--paper);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--nelnet-green) 0%, var(--nelnet-green-dark) 100%);
+    padding: 22px 24px 20px;
+    position: relative;
+  }
+
+  .header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--ink);
+    color: var(--nelnet-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    letter-spacing: 0.2px;
+  }
+
+  .header h1 {
+    margin: 16px 0 4px;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .header p {
+    margin: 0;
+    font-size: 13.5px;
+    color: rgba(30,36,34,0.75);
+    line-height: 1.45;
+  }
+
+  .status-pill {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(30,36,34,0.15);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .body {
+    padding: 22px 24px 24px;
+  }
+
+  .field-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 13px 16px;
+    background: var(--paper);
+  }
+
+  .field-row + .field-row {
+    border-top: 1px solid var(--line);
+  }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+
+  .field-value {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  .field-value.muted {
+    color: var(--ink-soft);
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 13px 16px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.06s ease, opacity 0.15s ease, background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+  .btn-verify {
+    background: var(--ink);
+    color: var(--nelnet-green);
+  }
+  .btn-verify:hover:not(:disabled) { background: #2A322F; }
+
+  .btn-dispute {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--line);
+  }
+  .btn-dispute:hover:not(:disabled) { background: var(--danger-tint); border-color: #EBD4D1; }
+
+  .footnote {
+    margin-top: 16px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  /* Confirmation state */
+  .confirm-panel {
+    display: none;
+    padding: 30px 24px 28px;
+    text-align: center;
+  }
+
+  .confirm-panel.show { display: block; }
+  .body.hide { display: none; }
+
+  .confirm-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 24px;
+  }
+
+  .confirm-icon.success {
+    background: rgba(186,202,42,0.18);
+    color: var(--nelnet-green-dark);
+  }
+
+  .confirm-icon.dispute {
+    background: var(--danger-tint);
+    color: var(--danger);
+  }
+
+  .confirm-title {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .confirm-text {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <div class="header">
+    <span class="status-pill" id="statusPill">Pending</span>
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div class="brand-name">Nelnet</div>
+    </div>
+    <h1>Please verify your information</h1>
+    <p>Confirm the details below are correct before we continue.</p>
+  </div>
+
+  <div class="body" id="body">
+    <div class="field-list" id="fieldList">
+      <div class="field-row">
+        <span class="field-label">Name</span>
+        <span class="field-value" id="fieldName">—</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Address</span>
+        <span class="field-value" id="fieldAddress">—</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Phone</span>
+        <span class="field-value" id="fieldPhone">—</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Email</span>
+        <span class="field-value" id="fieldEmail">—</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-verify" id="verifyBtn">Yes, this is correct</button>
+      <button class="btn-dispute" id="disputeBtn">This isn't me</button>
+    </div>
+
+    <p class="footnote">Your response helps us keep your account secure and up to date.</p>
+  </div>
+
+  <div class="confirm-panel" id="confirmPanel">
+    <div class="confirm-icon" id="confirmIcon"></div>
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-text" id="confirmText"></div>
+  </div>
+</div>
+
+<script>
+  // ---- Config: map context field names here if Nelnet's Cognigy flow uses different keys ----
+  const FIELD_MAP = {
+    name: "fullName",
+    address: "address",
+    phone: "phone",
+    email: "email"
+  };
+
+  // ---- Dev fallback mock context (only used when no webchat context is available, e.g. local testing) ----
+  const MOCK_CONTEXT = {
+    fullName: "Jordan Ellis",
+    address: "4820 S 133rd St, Omaha, NE 68137",
+    phone: "(402) 555-0148",
+    email: "jordan.ellis@example.com"
+  };
+
+  let currentContext = null;
+
+  function renderContext(context) {
+    currentContext = context || {};
+    setField("fieldName", currentContext[FIELD_MAP.name]);
+    setField("fieldAddress", currentContext[FIELD_MAP.address]);
+    setField("fieldPhone", currentContext[FIELD_MAP.phone]);
+    setField("fieldEmail", currentContext[FIELD_MAP.email]);
+  }
+
+  function setField(elId, value) {
+    const el = document.getElementById(elId);
+    if (value) {
+      el.textContent = value;
+      el.classList.remove("muted");
+    } else {
+      el.textContent = "Not provided";
+      el.classList.add("muted");
+    }
+  }
+
+  function showConfirmation(type) {
+    document.getElementById("body").classList.add("hide");
+    const panel = document.getElementById("confirmPanel");
+    const icon = document.getElementById("confirmIcon");
+    const title = document.getElementById("confirmTitle");
+    const text = document.getElementById("confirmText");
+    const pill = document.getElementById("statusPill");
+
+    if (type === "verified") {
+      icon.className = "confirm-icon success";
+      icon.textContent = "✓";
+      title.textContent = "Thanks — you're verified";
+      text.textContent = "We've confirmed your information on file.";
+      pill.textContent = "Verified";
+    } else {
+      icon.className = "confirm-icon dispute";
+      icon.textContent = "!";
+      title.textContent = "Thanks for letting us know";
+      text.textContent = "We've flagged this for review. Someone will follow up with you shortly.";
+      pill.textContent = "Flagged";
+    }
+    panel.classList.add("show");
+  }
+
+  function submitToFlow(action) {
+    const payload = {
+      action: action, // "verified" | "disputed"
+      name: currentContext ? currentContext[FIELD_MAP.name] : null,
+      address: currentContext ? currentContext[FIELD_MAP.address] : null,
+      phone: currentContext ? currentContext[FIELD_MAP.phone] : null,
+      email: currentContext ? currentContext[FIELD_MAP.email] : null,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      if (window.SDK && typeof window.SDK.submit === "function") {
+        window.SDK.submit(payload);
+      } else {
+        console.log("[dev] SDK.submit payload:", payload);
+      }
+    } catch (err) {
+      console.error("SDK.submit failed:", err);
+    }
+  }
+
+  document.getElementById("verifyBtn").addEventListener("click", function () {
+    document.getElementById("verifyBtn").disabled = true;
+    document.getElementById("disputeBtn").disabled = true;
+    showConfirmation("verified");
+    submitToFlow("verified");
+  });
+
+  document.getElementById("disputeBtn").addEventListener("click", function () {
+    document.getElementById("verifyBtn").disabled = true;
+    document.getElementById("disputeBtn").disabled = true;
+    showConfirmation("disputed");
+    submitToFlow("disputed");
+  });
+
+  // ---- Wire up to Cognigy webchat context ----
+  window.addEventListener("webchatReady", function () {
+    try {
+      const sessionState = window.cognigyWebchat.getSessionState();
+      const context = (sessionState && sessionState.context) || {};
+      renderContext(context);
+    } catch (err) {
+      console.error("Failed to read webchat context:", err);
+      renderContext(MOCK_CONTEXT);
+    }
+  });
+
+  // Local/dev fallback: if webchatReady never fires (e.g. testing outside Cognigy), use mock data
+  setTimeout(function () {
+    if (!currentContext) {
+      renderContext(MOCK_CONTEXT);
+    }
+  }, 800);
+</script>
+
+</body>
+</html>
