@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nelnet — Make a Payment</title>
+<style>
+  :root {
+    --nelnet-green: #BACA2A;
+    --nelnet-green-dark: #9FAE1F;
+    --nelnet-grey: #A4AAAD;
+    --ink: #1E2422;
+    --ink-soft: #5B6360;
+    --paper: #FFFFFF;
+    --paper-tint: #F6F7F2;
+    --line: #E4E7DF;
+    --danger: #C0392B;
+    --danger-tint: #FBEBE9;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(30,36,34,0.06), 0 8px 24px rgba(30,36,34,0.06);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--paper-tint); color: var(--ink); }
+
+  .card {
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--paper);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--nelnet-green) 0%, var(--nelnet-green-dark) 100%);
+    padding: 20px 24px 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--ink); color: var(--nelnet-green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; flex-shrink: 0;
+  }
+  .brand-name { font-weight: 700; font-size: 15px; color: var(--ink); }
+  .header h1 { margin: 14px 0 2px; font-size: 18px; font-weight: 700; color: var(--ink); }
+  .header p { margin: 0; font-size: 13px; color: rgba(30,36,34,0.75); }
+
+  /* Progress */
+  .progress {
+    display: flex;
+    padding: 14px 24px;
+    gap: 6px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line);
+    transition: background 0.2s ease;
+  }
+  .progress-step.active { background: var(--nelnet-green-dark); }
+  .progress-step.done { background: var(--nelnet-grey); }
+
+  .body { padding: 22px 24px 24px; }
+  .step { display: none; }
+  .step.active { display: block; }
+
+  h2.step-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  p.step-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    line-height: 1.4;
+  }
+
+  /* Method selector cards */
+  .method-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+  .method-option {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .method-option:hover { border-color: var(--nelnet-grey); }
+  .method-option.selected {
+    border-color: var(--nelnet-green-dark);
+    background: rgba(186,202,42,0.08);
+  }
+  .method-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--paper-tint);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .method-text { flex: 1; }
+  .method-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .method-desc { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+  .method-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--line); flex-shrink: 0;
+    position: relative;
+  }
+  .method-option.selected .method-radio { border-color: var(--nelnet-green-dark); }
+  .method-option.selected .method-radio::after {
+    content: ""; position: absolute; inset: 3px;
+    border-radius: 50%; background: var(--nelnet-green-dark);
+  }
+
+  /* Form fields */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--ink-soft); text-transform: uppercase;
+    letter-spacing: 0.4px; margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 11px 12px; font-size: 14.5px;
+    border: 1.5px solid var(--line); border-radius: 8px;
+    font-family: inherit; color: var(--ink); background: var(--paper);
+  }
+  .field input:focus, .field select:focus {
+    outline: none; border-color: var(--nelnet-green-dark);
+  }
+  .field-row { display: flex; gap: 12px; }
+  .field-row .field { flex: 1; }
+  .field .error-msg {
+    font-size: 11.5px; color: var(--danger); margin-top: 5px; display: none;
+  }
+  .field.invalid input, .field.invalid select { border-color: var(--danger); }
+  .field.invalid .error-msg { display: block; }
+
+  .amount-field { margin-bottom: 20px; }
+  .amount-field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--ink-soft); text-transform: uppercase;
+    letter-spacing: 0.4px; margin-bottom: 6px;
+  }
+  .amount-input-wrap {
+    display: flex; align-items: center;
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 4px 12px; background: var(--paper);
+  }
+  .amount-input-wrap:focus-within { border-color: var(--nelnet-green-dark); }
+  .amount-input-wrap span { font-size: 18px; font-weight: 700; color: var(--ink-soft); margin-right: 4px; }
+  .amount-input-wrap input {
+    border: none; font-size: 20px; font-weight: 700; color: var(--ink);
+    padding: 8px 0; font-family: inherit; width: 100%;
+  }
+  .amount-input-wrap input:focus { outline: none; }
+
+  /* Signature step */
+  .sig-toggle {
+    display: flex; border: 1.5px solid var(--line); border-radius: 8px;
+    overflow: hidden; margin-bottom: 16px;
+  }
+  .sig-toggle button {
+    flex: 1; padding: 10px; font-size: 13px; font-weight: 700;
+    border: none; background: var(--paper); color: var(--ink-soft);
+    cursor: pointer; font-family: inherit;
+  }
+  .sig-toggle button.active { background: var(--ink); color: var(--nelnet-green); }
+
+  .sig-pane { display: none; }
+  .sig-pane.active { display: block; }
+
+  #sigCanvas {
+    width: 100%; height: 150px; border: 1.5px dashed var(--nelnet-grey);
+    border-radius: 10px; background: var(--paper-tint); touch-action: none;
+    display: block;
+  }
+  .sig-canvas-actions {
+    display: flex; justify-content: flex-end; margin-top: 8px;
+  }
+  .sig-clear-btn {
+    background: none; border: none; color: var(--ink-soft);
+    font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 4px 0;
+  }
+  .sig-clear-btn:hover { color: var(--danger); }
+
+  .consent-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-top: 14px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.5;
+  }
+  .consent-row input { margin-top: 2px; flex-shrink: 0; }
+
+  .summary-box {
+    background: var(--paper-tint); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; font-size: 13px;
+    padding: 4px 0;
+  }
+  .summary-row span:first-child { color: var(--ink-soft); }
+  .summary-row span:last-child { font-weight: 700; color: var(--ink); }
+
+  /* Buttons */
+  .actions { display: flex; gap: 10px; }
+  button.nav-btn {
+    font-family: inherit; font-size: 14.5px; font-weight: 700;
+    border-radius: 10px; padding: 13px 16px; border: none;
+    cursor: pointer; flex: 1; transition: transform 0.06s ease, background 0.15s ease;
+  }
+  button.nav-btn:active { transform: scale(0.98); }
+  button.nav-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+  .btn-primary { background: var(--ink); color: var(--nelnet-green); }
+  .btn-primary:hover:not(:disabled) { background: #2A322F; }
+  .btn-secondary { background: transparent; color: var(--ink); border: 1.5px solid var(--line); flex: 0 0 auto; padding-left: 20px; padding-right: 20px; }
+  .btn-secondary:hover:not(:disabled) { background: var(--paper-tint); }
+
+  .footnote {
+    margin-top: 14px; font-size: 11px; color: var(--ink-soft);
+    line-height: 1.5; text-align: center;
+  }
+
+  /* Confirmation */
+  .confirm-panel { display: none; padding: 34px 24px 30px; text-align: center; }
+  .confirm-panel.show { display: block; }
+  .confirm-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px; font-size: 24px;
+    background: rgba(186,202,42,0.18); color: var(--nelnet-green-dark);
+  }
+  .confirm-title { font-size: 16.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .confirm-text { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div class="brand-name">Nelnet</div>
+    </div>
+    <h1 id="headerTitle">Make a payment</h1>
+    <p id="headerSub">Choose how you'd like to pay</p>
+  </div>
+
+  <div class="progress" id="progress">
+    <div class="progress-step active" data-step="0"></div>
+    <div class="progress-step" data-step="1"></div>
+    <div class="progress-step" data-step="2"></div>
+  </div>
+
+  <div class="body" id="body">
+
+    <!-- STEP 0: Payment method -->
+    <div class="step active" data-step="0">
+      <h2 class="step-title">Payment method</h2>
+      <p class="step-sub">Select how you'd like to make your payment.</p>
+
+      <div class="method-options">
+        <div class="method-option" data-method="debit" id="optDebit">
+          <div class="method-icon">💳</div>
+          <div class="method-text">
+            <div class="method-title">Debit card</div>
+            <div class="method-desc">Pay instantly with a debit card</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+        <div class="method-option" data-method="bank" id="optBank">
+          <div class="method-icon">🏦</div>
+          <div class="method-text">
+            <div class="method-title">Bank account</div>
+            <div class="method-desc">Checking or savings (ACH)</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+      </div>
+
+      <div class="amount-field" style="margin-top: 20px;">
+        <label>Payment amount</label>
+        <div class="amount-input-wrap">
+          <span>$</span>
+          <input type="text" inputmode="decimal" id="amountInput" placeholder="0.00" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="nav-btn btn-primary" id="toDetailsBtn" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Payment details -->
+    <div class="step" data-step="1">
+      <h2 class="step-title" id="detailsTitle">Card details</h2>
+      <p class="step-sub" id="detailsSub">Enter your debit card information.</p>
+
+      <!-- Debit fields -->
+      <div id="debitFields">
+        <div class="field" id="f_cardName">
+          <label>Name on card</label>
+          <input type="text" id="cardName" placeholder="Jordan Ellis" />
+          <div class="error-msg">Enter the name as it appears on the card.</div>
+        </div>
+        <div class="field" id="f_cardNumber">
+          <label>Card number</label>
+          <input type="text" id="cardNumber" inputmode="numeric" placeholder="•••• •••• •••• ••••" maxlength="19" />
+          <div class="error-msg">Enter a valid 16-digit card number.</div>
+        </div>
+        <div class="field-row">
+          <div class="field" id="f_cardExp">
+            <label>Expiration</label>
+            <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" />
+            <div class="error-msg">Use MM/YY format.</div>
+          </div>
+          <div class="field" id="f_cardCvv">
+            <label>CVV</label>
+            <input type="text" id="cardCvv" inputmode="numeric" placeholder="•••" maxlength="4" />
+            <div class="error-msg">3–4 digit security code.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank fields -->
+      <div id="bankFields" style="display:none;">
+        <div class="field" id="f_bankName">
+          <label>Account holder name</label>
+          <input type="text" id="bankHolderName" placeholder="Jordan Ellis" />
+          <div class="error-msg">Enter the account holder's name.</div>
+        </div>
+        <div class="field" id="f_acctType">
+          <label>Account type</label>
+          <select id="acctType">
+            <option value="checking">Checking</option>
+            <option value="savings">Savings</option>
+          </select>
+        </div>
+        <div class="field" id="f_routing">
+          <label>Routing number</label>
+          <input type="text" id="routingNumber" inputmode="numeric" placeholder="•••••••••" maxlength="9" />
+          <div class="error-msg">Enter a valid 9-digit routing number.</div>
+        </div>
+        <div class="field" id="f_accountNum">
+          <label>Account number</label>
+          <input type="text" id="accountNumber" inputmode="numeric" placeholder="Account number" maxlength="17" />
+          <div class="error-msg">Enter a valid account number.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="nav-btn btn-secondary" id="backToMethodBtn">Back</button>
+        <button class="nav-btn btn-primary" id="toSignBtn">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Signature -->
+    <div class="step" data-step="2">
+      <h2 class="step-title">Authorize payment</h2>
+      <p class="step-sub">Sign to authorize this payment.</p>
+
+      <div class="summary-box" id="summaryBox"></div>
+
+      <div class="sig-toggle">
+        <button class="active" id="drawTabBtn" type="button">Draw signature</button>
+        <button id="typeTabBtn" type="button">Type name</button>
+      </div>
+
+      <div class="sig-pane active" id="drawPane">
+        <canvas id="sigCanvas"></canvas>
+        <div class="sig-canvas-actions">
+          <button class="sig-clear-btn" id="clearSigBtn" type="button">Clear signature</button>
+        </div>
+      </div>
+
+      <div class="sig-pane" id="typePane">
+        <div class="field">
+          <label>Type your full legal name</label>
+          <input type="text" id="typedSignature" placeholder="Jordan Ellis" />
+        </div>
+      </div>
+
+      <div class="consent-row">
+        <input type="checkbox" id="consentCheck" />
+        <label for="consentCheck">I authorize Nelnet to process this payment using the information provided, and I agree that my signature above is legally binding.</label>
+      </div>
+
+      <div class="actions" style="margin-top: 18px;">
+        <button class="nav-btn btn-secondary" id="backToDetailsBtn">Back</button>
+        <button class="nav-btn btn-primary" id="submitBtn" disabled>Submit payment</button>
+      </div>
+
+      <p class="footnote">Your payment information is encrypted and processed securely.</p>
+    </div>
+
+  </div>
+
+  <div class="confirm-panel" id="confirmPanel">
+    <div class="confirm-icon">✓</div>
+    <div class="confirm-title">Payment submitted</div>
+    <div class="confirm-text" id="confirmText">We're processing your payment now. You'll receive a confirmation shortly.</div>
+  </div>
+</div>
+
+<script>
+  // ---- Config: map context field names here if Nelnet's flow uses different keys ----
+  const CONTEXT_FIELD_MAP = {
+    amountDue: "amountDue",
+    payerName: "fullName"
+  };
+
+  const MOCK_CONTEXT = {
+    amountDue: "125.00",
+    fullName: "Jordan Ellis"
+  };
+
+  let context = {};
+  let selectedMethod = null;
+  let currentStep = 0;
+
+  // ---------- Context loading ----------
+  function applyContext(ctx) {
+    context = ctx || {};
+    const amt = context[CONTEXT_FIELD_MAP.amountDue];
+    if (amt) document.getElementById("amountInput").value = amt;
+    const name = context[CONTEXT_FIELD_MAP.payerName];
+    if (name) {
+      document.getElementById("cardName").value = name;
+      document.getElementById("bankHolderName").value = name;
+    }
+  }
+
+  window.addEventListener("webchatReady", function () {
+    try {
+      const sessionState = window.cognigyWebchat.getSessionState();
+      applyContext((sessionState && sessionState.context) || {});
+    } catch (err) {
+      console.error("Failed to read webchat context:", err);
+      applyContext(MOCK_CONTEXT);
+    }
+  });
+  setTimeout(function () {
+    if (!context || Object.keys(context).length === 0) applyContext(MOCK_CONTEXT);
+  }, 800);
+
+  // ---------- Step navigation ----------
+  function goToStep(stepIndex) {
+    document.querySelectorAll(".step").forEach(el => {
+      el.classList.toggle("active", Number(el.dataset.step) === stepIndex);
+    });
+    document.querySelectorAll(".progress-step").forEach(el => {
+      const idx = Number(el.dataset.step);
+      el.classList.toggle("active", idx === stepIndex);
+      el.classList.toggle("done", idx < stepIndex);
+    });
+    currentStep = stepIndex;
+
+    const titles = ["Make a payment", "Payment details", "Authorize payment"];
+    const subs = [
+      "Choose how you'd like to pay",
+      selectedMethod === "debit" ? "Enter your debit card information" : "Enter your bank account information",
+      "Review and sign to authorize"
+    ];
+    document.getElementById("headerTitle").textContent = titles[stepIndex];
+    document.getElementById("headerSub").textContent = subs[stepIndex];
+
+    if (stepIndex === 2) renderSummary();
+    if (stepIndex === 2) setTimeout(initCanvas, 50);
+  }
+
+  // ---------- Step 0: method + amount ----------
+  document.getElementById("optDebit").addEventListener("click", () => selectMethod("debit"));
+  document.getElementById("optBank").addEventListener("click", () => selectMethod("bank"));
+
+  function selectMethod(method) {
+    selectedMethod = method;
+    document.getElementById("optDebit").classList.toggle("selected", method === "debit");
+    document.getElementById("optBank").classList.toggle("selected", method === "bank");
+    validateStep0();
+  }
+
+  function validateStep0() {
+    const amt = parseFloat(document.getElementById("amountInput").value);
+    const valid = selectedMethod && amt > 0;
+    document.getElementById("toDetailsBtn").disabled = !valid;
+  }
+  document.getElementById("amountInput").addEventListener("input", validateStep0);
+
+  document.getElementById("toDetailsBtn").addEventListener("click", function () {
+    document.getElementById("debitFields").style.display = selectedMethod === "debit" ? "block" : "none";
+    document.getElementById("bankFields").style.display = selectedMethod === "bank" ? "block" : "none";
+    document.getElementById("detailsTitle").textContent = selectedMethod === "debit" ? "Card details" : "Bank account details";
+    document.getElementById("detailsSub").textContent = selectedMethod === "debit"
+      ? "Enter your debit card information."
+      : "Enter your checking or savings account information.";
+    goToStep(1);
+  });
+
+  // ---------- Step 1: details validation ----------
+  document.getElementById("cardNumber").addEventListener("input", function (e) {
+    let digits = e.target.value.replace(/\D/g, "").slice(0, 16);
+    e.target.value = digits.replace(/(.{4})/g, "$1 ").trim();
+  });
+  document.getElementById("cardExp").addEventListener("input", function (e) {
+    let digits = e.target.value.replace(/\D/g, "").slice(0, 4);
+    if (digits.length >= 3) digits = digits.slice(0, 2) + "/" + digits.slice(2);
+    e.target.value = digits;
+  });
+  document.getElementById("cardCvv").addEventListener("input", function (e) {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4);
+  });
+  document.getElementById("routingNumber").addEventListener("input", function (e) {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 9);
+  });
+  document.getElementById("accountNumber").addEventListener("input", function (e) {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 17);
+  });
+
+  function setFieldValid(id, valid) {
+    document.getElementById(id).classList.toggle("invalid", !valid);
+  }
+
+  function validateDetails() {
+    if (selectedMethod === "debit") {
+      const nameOk = document.getElementById("cardName").value.trim().length > 1;
+      const numOk = document.getElementById("cardNumber").value.replace(/\D/g, "").length === 16;
+      const expVal = document.getElementById("cardExp").value;
+      const expOk = /^\d{2}\/\d{2}$/.test(expVal);
+      const cvvOk = /^\d{3,4}$/.test(document.getElementById("cardCvv").value);
+      setFieldValid("f_cardName", nameOk);
+      setFieldValid("f_cardNumber", numOk);
+      setFieldValid("f_cardExp", expOk);
+      setFieldValid("f_cardCvv", cvvOk);
+      return nameOk && numOk && expOk && cvvOk;
+    } else {
+      const nameOk = document.getElementById("bankHolderName").value.trim().length > 1;
+      const routingOk = /^\d{9}$/.test(document.getElementById("routingNumber").value);
+      const acctOk = document.getElementById("accountNumber").value.trim().length >= 4;
+      setFieldValid("f_bankName", nameOk);
+      setFieldValid("f_routing", routingOk);
+      setFieldValid("f_accountNum", acctOk);
+      return nameOk && routingOk && acctOk;
+    }
+  }
+
+  document.getElementById("toSignBtn").addEventListener("click", function () {
+    if (validateDetails()) goToStep(2);
+  });
+  document.getElementById("backToMethodBtn").addEventListener("click", () => goToStep(0));
+  document.getElementById("backToDetailsBtn").addEventListener("click", () => goToStep(1));
+
+  // ---------- Step 2: summary ----------
+  function renderSummary() {
+    const amt = parseFloat(document.getElementById("amountInput").value || "0").toFixed(2);
+    let methodLine, detailLine;
+    if (selectedMethod === "debit") {
+      const last4 = document.getElementById("cardNumber").value.replace(/\D/g, "").slice(-4);
+      methodLine = "Debit card";
+      detailLine = "•••• " + (last4 || "----");
+    } else {
+      const last4 = document.getElementById("accountNumber").value.slice(-4);
+      const type = document.getElementById("acctType").value;
+      methodLine = "Bank account (" + (type.charAt(0).toUpperCase() + type.slice(1)) + ")";
+      detailLine = "•••• " + (last4 || "----");
+    }
+    document.getElementById("summaryBox").innerHTML =
+      '<div class="summary-row"><span>Amount</span><span>$' + amt + '</span></div>' +
+      '<div class="summary-row"><span>Method</span><span>' + methodLine + '</span></div>' +
+      '<div class="summary-row"><span>Account</span><span>' + detailLine + '</span></div>';
+  }
+
+  // ---------- Signature: draw vs type toggle ----------
+  document.getElementById("drawTabBtn").addEventListener("click", function () {
+    this.classList.add("active");
+    document.getElementById("typeTabBtn").classList.remove("active");
+    document.getElementById("drawPane").classList.add("active");
+    document.getElementById("typePane").classList.remove("active");
+    validateSignature();
+  });
+  document.getElementById("typeTabBtn").addEventListener("click", function () {
+    this.classList.add("active");
+    document.getElementById("drawTabBtn").classList.remove("active");
+    document.getElementById("typePane").classList.add("active");
+    document.getElementById("drawPane").classList.remove("active");
+    validateSignature();
+  });
+
+  // ---------- Canvas signature pad ----------
+  let canvas, ctx, drawing = false, hasDrawn = false;
+  function initCanvas() {
+    canvas = document.getElementById("sigCanvas");
+    if (!canvas || canvas.dataset.inited) return;
+    canvas.dataset.inited = "true";
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx = canvas.getContext("2d");
+    ctx.scale(2, 2);
+    ctx.strokeStyle = "#1E2422";
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = "round";
+
+    function pos(e) {
+      const r = canvas.getBoundingClientRect();
+      const p = e.touches ? e.touches[0] : e;
+      return { x: p.clientX - r.left, y: p.clientY - r.top };
+    }
+    function start(e) { drawing = true; hasDrawn = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); validateSignature(); }
+    function move(e) { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    function end() { drawing = false; }
+
+    canvas.addEventListener("mousedown", start);
+    canvas.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", end);
+    canvas.addEventListener("touchstart", start, { passive: true });
+    canvas.addEventListener("touchmove", move, { passive: false });
+    canvas.addEventListener("touchend", end);
+  }
+
+  document.getElementById("clearSigBtn").addEventListener("click", function () {
+    if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawn = false;
+    validateSignature();
+  });
+
+  document.getElementById("typedSignature").addEventListener("input", validateSignature);
+  document.getElementById("consentCheck").addEventListener("change", validateSignature);
+
+  function isDrawMode() {
+    return document.getElementById("drawPane").classList.contains("active");
+  }
+
+  function validateSignature() {
+    const consent = document.getElementById("consentCheck").checked;
+    let sigOk;
+    if (isDrawMode()) {
+      sigOk = hasDrawn;
+    } else {
+      sigOk = document.getElementById("typedSignature").value.trim().length > 1;
+    }
+    document.getElementById("submitBtn").disabled = !(consent && sigOk);
+  }
+
+  // ---------- Submit ----------
+  document.getElementById("submitBtn").addEventListener("click", function () {
+    const amt = parseFloat(document.getElementById("amountInput").value || "0").toFixed(2);
+
+    let paymentDetails = {};
+    if (selectedMethod === "debit") {
+      paymentDetails = {
+        nameOnCard: document.getElementById("cardName").value.trim(),
+        cardNumber: document.getElementById("cardNumber").value.replace(/\s/g, ""),
+        expiration: document.getElementById("cardExp").value,
+        cvv: document.getElementById("cardCvv").value
+      };
+    } else {
+      paymentDetails = {
+        accountHolderName: document.getElementById("bankHolderName").value.trim(),
+        accountType: document.getElementById("acctType").value,
+        routingNumber: document.getElementById("routingNumber").value,
+        accountNumber: document.getElementById("accountNumber").value
+      };
+    }
+
+    let signature = {};
+    if (isDrawMode()) {
+      signature = {
+        type: "drawn",
+        data: hasDrawn ? canvas.toDataURL("image/png") : null
+      };
+    } else {
+      signature = {
+        type: "typed",
+        data: document.getElementById("typedSignature").value.trim()
+      };
+    }
+
+    const payload = {
+      paymentMethod: selectedMethod, // "debit" | "bank"
+      amount: amt,
+      paymentDetails: paymentDetails,
+      signature: signature,
+      consentAccepted: document.getElementById("consentCheck").checked,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      if (window.SDK && typeof window.SDK.submit === "function") {
+        window.SDK.submit(payload);
+      } else {
+        console.log("[dev] SDK.submit payload:", payload);
+      }
+    } catch (err) {
+      console.error("SDK.submit failed:", err);
+    }
+
+    document.getElementById("body").style.display = "none";
+    document.getElementById("progress").style.display = "none";
+    document.getElementById("confirmText").textContent =
+      "We're processing your $" + amt + " payment now. You'll receive a confirmation shortly.";
+    document.getElementById("confirmPanel").classList.add("show");
+  });
+</script>
+
+</body>
+</html>
